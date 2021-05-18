@@ -17,6 +17,9 @@ public class dbquery {
         }
 
         String text = args[0];
+        // match text format, as this won't change, create only once
+        String sFormat = String.format("(.*)%s(.*)", text);
+
         int pageSize = Integer.parseInt(args[constants.DBQUERY_PAGE_SIZE_ARG]);
 
         String datafile = "heap." + pageSize;
@@ -63,7 +66,6 @@ public class dbquery {
 
                     // Check for match to "text"
                     String sdtNameString = new String(sdtnameBytes);
-                    String sFormat = String.format("(.*)%s(.*)", text);
                     // if match is found, copy bytes of other fields and print out the record
                     if (sdtNameString.matches(sFormat)) {
                         /*

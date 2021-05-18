@@ -25,3 +25,6 @@ hs_err_pid*
 # csv data file
 *.csv
 heap.*
+
+# assignment pdf file
+*.pdf
