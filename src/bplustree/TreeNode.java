@@ -1,13 +1,16 @@
 package bplustree;
 
-import java.util.LinkedList;
+public class TreeNode extends TNode{
+    public TreeNode(int degree){
+        super(degree);
+    }
+    @Override
+    public void insert(String index) {
 
-public abstract class TreeNode {
-    // Doubly LinkedList of keys
-    private LinkedList<Long> keys;
-    // datafile index as
-    private String index;
-    // Current capacity
-    private int capacity;
+    }
+
+    @Override
+    public void delete(String index) {
+
+    }
 }
-

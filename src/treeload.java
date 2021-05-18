@@ -14,6 +14,6 @@ public class treeload {
         long startTime = 0;
         long finishTime = 0;
 
-        BPlusTree tree = new BPlusTree();
+//        BPlusTree tree = new BPlusTree(x);
     }
 }
