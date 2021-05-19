@@ -9,13 +9,15 @@ public class test {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Input degree for Tree:");
         String line = stdin.readLine();
+        int temp = 0;
         BPlusTree myTree = new BPlusTree(Integer.parseInt(line));
         while (true){
             System.out.println("Input index, int, int");
             line = stdin.readLine();
             if (line.compareTo("\n\n")==0 || line.compareTo("\n")==0 || line.compareTo(" ")==0)
                 break;
-            myTree.insert(line.split("\n")[0], 0,0);
+            myTree.insert(line.split("\n")[0], temp,temp);
+            temp++;
             myTree.bfs_debug();
         }
     }

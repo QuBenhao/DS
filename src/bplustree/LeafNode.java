@@ -1,14 +1,43 @@
 package bplustree;
 
+import javafx.util.Pair;
+
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 public class LeafNode extends TNode{
     // Doubly LinkedList
     public LeafNode left, right;
+    public LinkedList<Pair<Integer, Integer>> values;
 
-    public LeafNode(int max_capacity){
-        super(max_capacity);
+    public LeafNode(){
+        super();
+        this.left = this.right = null;
+        this.values = new LinkedList<>();
+    }
+
+    public LeafNode(Pair<LinkedList<String>,LinkedList<Pair<Integer, Integer>>> lists){
+        super(new Pair<>(lists.getKey(),new LinkedList<>()));
+        this.keys = lists.getKey();
+        this.values = lists.getValue();
         this.left = this.right = null;
     }
 
+    public Pair<LinkedList<String>,LinkedList<Pair<Integer, Integer>>> split(){
+        LinkedList<String> keys = new LinkedList<>();
+        LinkedList<Pair<Integer,Integer>> values = new LinkedList<>();
+        ListIterator<String> iterators = this.keys.listIterator(this.capacity/2);
+        ListIterator<Pair<Integer,Integer>> v_iterators = this.values.listIterator(this.capacity/2);
+        while (iterators.hasNext()){
+            String index = iterators.next();
+            Pair<Integer,Integer> value = v_iterators.next();
+            keys.add(index);
+            values.add(value);
+        }
+        this.keys.removeAll(keys);
+        this.values.removeAll(values);
+        return new Pair<>(keys, values);
+    }
     /*
      * Insert has three situation:
      * 1. Both LeafNode and TreeNode are not full, insert into LeafNode directly
@@ -18,76 +47,36 @@ public class LeafNode extends TNode{
      */
     @Override
     public void insert(String index, int pageIndex, int slots) {
-        ListNode curr = this.root, prev = null;
-        // insert index into the LinkedList
-        while (curr!=null){
-            int cmp = curr.index.compareTo(index);
-            // insert index with ordering
-            if(cmp > 0){
-                if(prev == null){
-                    this.root = new LeafListNode(index, pageIndex, slots);
-                    this.root.next = curr;
-                    curr.prev = this.root;
-                }else {
-                    prev.next = new LeafListNode(index, pageIndex, slots);
-                    prev.next.prev = prev;
-                    prev = prev.next;
-                    prev.next = curr;
-                    curr.prev = prev;
-                }
-                this.capacity++;
-                break;
-            }
-            prev = curr;
-            curr = curr.next;
+        int pos = this.binary_search(index) + 1;
+        if(pos == this.capacity){
+            this.keys.addLast(index);
+            this.values.addLast(new Pair<>(pageIndex, slots));
         }
-        // insert at back
-        if(curr == null){
-            curr = new LeafListNode(index, pageIndex, slots);
-            if(prev == null){
-                this.root = this.last = curr;
-            }else {
-                prev.next = curr;
-                curr.prev = prev;
-                this.last = curr;
-            }
-            this.capacity++;
+        else {
+            this.keys.add(pos, index);
+            this.values.add(pos, new Pair<>(pageIndex, slots));
         }
+        this.capacity++;
 
         // after the insertion, Node is full
-        if(this.capacity > this.max_capacity){
-            curr = this.root;
-            // find the middle LeafNode to separate
-            for(int i=0;i<this.sep_mid;i++){
-                curr = curr.next;
-            }
-            // create separated LeafNode
-            LeafNode sep_leaf = new LeafNode(this.max_capacity);
-            sep_leaf.capacity = this.capacity - this.sep_mid;
-            sep_leaf.root = curr;
-            sep_leaf.last = this.last;
-            sep_leaf.left = this;
-            sep_leaf.right = this.right;
-            sep_leaf.parent = this.parent;
+        if(this.capacity > BPlusTree.degree - 1){
+            // Separate TreeNode from mid
+            LeafNode sep_node = new LeafNode(this.split());
+            sep_node.parent = this.parent;
+            sep_node.left = this;
+            sep_node.right = this.right;
+            this.capacity = this.keys.size();
+            this.right = sep_node;
 
-            // break the link of ListNode between separate LeafNode and resign capacity
-            this.last = curr.prev;
-            this.last.next = null;
-            curr.prev = null;
-            this.capacity = this.sep_mid;
-            this.right = sep_leaf;
-
-            // insert middle index into parent TreeNode
             if(this.parent == null){
-                this.parent = new TreeNode(this.max_capacity);
+                this.parent = new TreeNode();
                 this.parent.leftmost_child = this;
-                this.parent.root = new ListNode();
-                this.parent.root.index = sep_leaf.root.index;
-                this.parent.root.child = sep_leaf;
+                this.parent.keys.add(sep_node.keys.getFirst());
+                this.parent.pointers.add(sep_node);
+                sep_node.parent = this.parent;
                 this.parent.capacity++;
-                sep_leaf.parent = this.parent;
             }else {
-                this.parent.insert(sep_leaf.root.index, sep_leaf);
+                this.parent.insert(sep_node.keys.getFirst(), sep_node);
             }
         }
     }
