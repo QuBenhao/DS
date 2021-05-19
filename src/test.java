@@ -1,11 +1,9 @@
 import bplustree.BPlusTree;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class test {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Input degree for Tree:");
         String line = stdin.readLine();
@@ -18,5 +16,17 @@ public class test {
             myTree.insert(line.split("\n")[0], 0,0);
             myTree.bfs_debug();
         }
+//        FileOutputStream fileOut = new FileOutputStream("tree.ser");
+//        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+//        out.writeObject(myTree);
+//        out.close();
+//        fileOut.close();
+
+//        FileInputStream fileIn = new FileInputStream("tree.ser");
+//        ObjectInputStream in = new ObjectInputStream(fileIn);
+//        BPlusTree myTree = (BPlusTree) in.readObject();
+//        in.close();
+//        fileIn.close();
+//        myTree.bfs_debug();
     }
 }

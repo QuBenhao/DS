@@ -1,6 +1,8 @@
 package bplustree;
 
-public class ListNode{
+import java.io.Serializable;
+
+public class ListNode implements Serializable {
     public ListNode prev, next;
     // index key
     public String index;

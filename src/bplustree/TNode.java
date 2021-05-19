@@ -1,6 +1,8 @@
 package bplustree;
 
-public abstract class TNode {
+import java.io.Serializable;
+
+public abstract class TNode implements Serializable {
     // the first and last ListNode
     public ListNode root, last;
     public TNode leftmost_child, parent;
@@ -92,7 +94,7 @@ public abstract class TNode {
                 sep_node.parent = this.parent;
                 this.parent.capacity++;
             }else {
-                this.parent.insert(index, this);
+                this.parent.insert(sep_node.root.index, this);
             }
             // TreeNode separate is different, as it needs to move middle index from sep_node.root to parent Node
             sep_node.leftmost_child = sep_node.root.child;
@@ -102,6 +104,8 @@ public abstract class TNode {
     }
 
     public void insert(String index, int pageIndex, int slots){
+        // insert into leftmost_child if index < root.index
+        // insert into last if index > last.index
         if(leftmost_child != null && index.compareTo(this.root.index) < 0){
             leftmost_child.insert(index, pageIndex, slots);
         }else if(this.last != null && index.compareTo(this.last.index) > 0){

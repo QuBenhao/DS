@@ -1,9 +1,12 @@
 package bplustree;
 
+import javafx.util.Pair;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
 // currently implement non-clustered index
-public class BPlusTree {
+public class BPlusTree implements Serializable {
     // the order of the tree
     public final int degree;
     public TNode root;
@@ -20,6 +23,11 @@ public class BPlusTree {
         if(this.root.parent != null)
             this.root = this.root.parent;
         this.root.debug_print();
+    }
+
+    public Pair<Integer, Integer> query(String index){
+
+        return null;
     }
 
     public void bfs_debug(){
