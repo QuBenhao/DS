@@ -1,5 +1,7 @@
 package bplustree;
 
+import javafx.util.Pair;
+
 import java.io.Serializable;
 
 public class ListNode implements Serializable {
@@ -24,10 +26,9 @@ public class ListNode implements Serializable {
 
 
 class LeafListNode extends ListNode{
-    public int pageIndex, slots;
+    public Pair<Integer,Integer> value;
     public LeafListNode(String index, int pageIndex, int slots){
         super(index);
-        this.pageIndex = pageIndex;
-        this.slots = slots;
+        value = new Pair<>(pageIndex, slots);
     }
 }

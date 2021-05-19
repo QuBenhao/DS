@@ -26,8 +26,23 @@ public class BPlusTree implements Serializable {
     }
 
     public Pair<Integer, Integer> query(String index){
+        Pair<Integer,Integer> result = this.root.query(index);
+        if(result == null)
+            System.out.printf("Index: %s does not exists!\n", index);
+        return result;
+    }
 
-        return null;
+    public ArrayList<Pair<Integer, Integer>> query(String start_index, String end_index){
+        // in case end_index is smaller than start index
+        if (start_index.compareTo(end_index) > 0){
+            String temp = end_index;
+            end_index = start_index;
+            start_index = temp;
+        }
+        ArrayList<Pair<Integer, Integer>> result = this.root.query(start_index, end_index);
+        if(result.isEmpty())
+            System.out.printf("Index: between %s and %s does not exists!\n", start_index, end_index);
+        return result;
     }
 
     public void bfs_debug(){

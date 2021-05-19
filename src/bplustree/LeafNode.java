@@ -1,5 +1,9 @@
 package bplustree;
 
+import javafx.util.Pair;
+
+import java.util.ArrayList;
+
 public class LeafNode extends TNode{
     // Doubly LinkedList
     public LeafNode left, right;
@@ -91,6 +95,39 @@ public class LeafNode extends TNode{
             }
         }
     }
+
+    @Override
+    public Pair<Integer, Integer> query(String index){
+        ListNode curr = this.root;
+        while (curr !=null){
+            if(index.compareTo(curr.index) == 0)
+                return ((LeafListNode)curr).value;
+            curr = curr.next;
+        }
+        return null;
+    }
+
+    // Range query
+    @Override
+    public ArrayList<Pair<Integer, Integer>> query(String start_index, String end_index) {
+        ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
+        LeafNode node = this;
+        while (node!=null){
+            ListNode curr = node.root;
+            while (curr!=null){
+                if(curr.index.compareTo(end_index) > 0)
+                    break;
+                if(curr.index.compareTo(start_index) >=0)
+                    result.add(((LeafListNode)curr).value);
+                curr = curr.next;
+            }
+            if(curr!=null && curr.index.compareTo(end_index) > 0)
+                break;
+            node = node.right;
+        }
+        return result;
+    }
+
 
     @Override
     public void delete(String index) {

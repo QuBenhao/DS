@@ -1,6 +1,9 @@
 package bplustree;
 
+import javafx.util.Pair;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public abstract class TNode implements Serializable {
     // the first and last ListNode
@@ -121,6 +124,41 @@ public abstract class TNode implements Serializable {
             }
 
         }
+    }
+
+    public Pair<Integer, Integer> query(String index){
+        if(leftmost_child != null && index.compareTo(this.root.index) < 0){
+            return leftmost_child.query(index);
+        }else if(this.last != null && index.compareTo(this.last.index) >= 0){
+            return this.last.child.query(index);
+        }else{
+            ListNode curr = this.root;
+            while (curr !=null){
+                if(index.compareTo(curr.index) >= 0)
+                    return curr.child.query(index);
+                curr = curr.next;
+            }
+
+        }
+        return null;
+    }
+
+    // Range query
+    public ArrayList<Pair<Integer, Integer>> query(String start_index, String end_index){
+        if(leftmost_child != null && start_index.compareTo(this.root.index) < 0){
+            return leftmost_child.query(start_index, end_index);
+        }else if(this.last != null && start_index.compareTo(this.last.index) >= 0){
+            return this.last.child.query(start_index, end_index);
+        }else{
+            ListNode curr = this.root;
+            while (curr !=null){
+                if(start_index.compareTo(curr.index) >= 0)
+                    return curr.child.query(start_index, end_index);
+                curr = curr.next;
+            }
+
+        }
+        return null;
     }
 
     public abstract void delete(String index);
