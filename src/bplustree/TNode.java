@@ -2,10 +2,9 @@ package bplustree;
 
 import javafx.util.Pair;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class TNode implements Serializable {
+public abstract class TNode{
     // the first and last ListNode
     public ListNode root, last;
     public TNode leftmost_child, parent;

@@ -110,5 +110,4 @@ public class constants{
     public static final int TREEQUERY_MAX_ARG_COUNT = 3;
     public static final int TREEQUERY_MAX_PAGE_SIZE_ARG = 2;
     public static final int TREELOAD_PAGE_SIZE_ARG = 0;
-    public static final int POINTER_SIZE = 10;
 }

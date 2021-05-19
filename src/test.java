@@ -1,4 +1,5 @@
 import bplustree.BPlusTree;
+import bplustree.TNode;
 import javafx.util.Pair;
 
 import java.io.*;
@@ -9,14 +10,14 @@ public class test {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Input degree for Tree:");
         String line = stdin.readLine();
-        BPlusTree myTree = new BPlusTree(Integer.parseInt(line));
+        BPlusTree myTree = new BPlusTree(Integer.parseInt(line), 4096);
         while (true){
             System.out.println("Input index, int, int");
             line = stdin.readLine();
             if (line.compareTo("\n\n")==0 || line.compareTo("\n")==0 || line.compareTo(" ")==0)
                 break;
             String[] arr = line.split("\n")[0].split(" ");
-            myTree.insert(arr[0], Integer.parseInt(arr[1]),Integer.parseInt(arr[2]));
+            myTree.insert(arr[0], 0,0);
             myTree.bfs_debug();
         }
 

@@ -2,6 +2,10 @@ package bplustree;
 
 import javafx.util.Pair;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class LeafNode extends TNode{
@@ -129,6 +133,63 @@ public class LeafNode extends TNode{
         return result;
     }
 
+    public void write_to_file(ByteArrayOutputStream byteOutputStream,DataOutputStream dataOutput, FileOutputStream outputStream) throws IOException {
+        /*
+        int capacity 4 bytes
+        for each{
+            String index 24 bytes
+            int pageIndex 4bytes
+            int slots 4bytes
+        }
+        total: capacity * 32 + 4 bytes
+        page needed = (capacity * 32 + 4) / pageSize
+        maximum = (degree-1) * 32 + 4
+         */
+        int num_records = 0;
+        ListNode curr = this.root;
+        System.out.println(BPlusTree.pageNeeded);
+        System.out.println(BPlusTree.num_record_per_page);
+        for(int i=0;i<BPlusTree.pageNeeded;i++) {
+            while (curr!=null && num_records < BPlusTree.num_record_per_page) {
+                dataOutput.writeBytes(this.getStringOfLength(curr.index, 24));
+                dataOutput.writeInt(((LeafListNode)curr).value.getKey());
+                dataOutput.writeInt(((LeafListNode)curr).value.getValue());
+                curr = curr.next;
+                num_records++;
+            }
+
+            byte[] page = new byte[BPlusTree.pageSize];
+            byte[] records = byteOutputStream.toByteArray();
+            System.out.println(records);
+            int numberBytesToCopy = byteOutputStream.size();
+            System.arraycopy(records, 0, page, 0, numberBytesToCopy);
+            outputStream.write(page);
+            byteOutputStream.reset();
+        }
+    }
+
+    // Returns a whitespace padded string of the same length as parameter int length
+    private String getStringOfLength(String original, int length) {
+
+        int lengthDiff = length - original.length();
+
+        // Check difference in string lengths
+        if (lengthDiff == 0) {
+            return original;
+        }
+        else if (lengthDiff > 0) {
+            // if original string is too short, pad end with whitespace
+            StringBuilder string = new StringBuilder(original);
+            for (int i = 0; i < lengthDiff; i++) {
+                string.append(" ");
+            }
+            return string.toString();
+        }
+        else {
+            // if original string is too long, shorten to required length
+            return original.substring(0, length);
+        }
+    }
 
     @Override
     public void delete(String index) {

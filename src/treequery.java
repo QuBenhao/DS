@@ -31,15 +31,6 @@ public class treequery {
             pageSize = Integer.parseInt(args[constants.TREEQUERY_MAX_PAGE_SIZE_ARG]);
         }else
             pageSize = Integer.parseInt(args[constants.TREEQUERY_MIN_PAGE_SIZE_ARG]);
-
-        FileInputStream fileIn = new FileInputStream(String.format("tree%d.ser",pageSize));
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        BPlusTree tree = (BPlusTree) in.readObject();
-        in.close();
-        fileIn.close();
-
-        tree.bfs_debug();
-
         String datafile = "heap." + pageSize;
         long startTime = 0;
         long finishTime = 0;
@@ -49,7 +40,13 @@ public class treequery {
 
         FileInputStream inStream = null;
         try{
-            inStream = new FileInputStream(datafile);
+            File file = new File(datafile);
+            inStream = new FileInputStream(file);
+            // calculate tree degree
+            int degree = (int) Math.sqrt((double) file.length()/pageSize);
+            BPlusTree tree = new BPlusTree(degree,pageSize);
+            tree.bfs_debug();
+
             startTime = System.nanoTime();
             byte[] sdtnameBytes = new byte[constants.STD_NAME_SIZE];
             byte[] idBytes = new byte[constants.ID_SIZE];

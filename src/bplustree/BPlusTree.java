@@ -2,19 +2,31 @@ package bplustree;
 
 import javafx.util.Pair;
 
-import java.io.Serializable;
+import java.io.File;
 import java.util.ArrayList;
 
 // currently implement non-clustered index
-public class BPlusTree implements Serializable {
+public class BPlusTree {
     // the order of the tree
-    public static int degree;
+    public static int degree, pageSize, pageNeeded,num_record_per_page;
     public TNode root;
 
-    public BPlusTree(int degree){
+    public BPlusTree(int degree, int pageSize){
         BPlusTree.degree = degree;
+        BPlusTree.pageSize = pageSize;
+        BPlusTree.pageNeeded = Math.max(1,(int) (Math.ceil((double) BPlusTree.degree * 32 - 28)/BPlusTree.pageSize));
+        BPlusTree.num_record_per_page = (BPlusTree.pageSize - 4) / 32;
         this.root = null;
     }
+
+    public BPlusTree(int degree, int pageSize, File file){
+        BPlusTree.degree = degree;
+        BPlusTree.pageSize = pageSize;
+        BPlusTree.pageNeeded = Math.max(1,(int) (Math.ceil((double) BPlusTree.degree * 32 - 28)/BPlusTree.pageSize));
+        BPlusTree.num_record_per_page = (BPlusTree.pageSize - 4) / 32;
+        this.root = null;
+    }
+
 
     public void insert(String index, int pageIndex, int slots){
         if(this.root == null)

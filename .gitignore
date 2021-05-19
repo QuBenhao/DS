@@ -29,3 +29,4 @@ heap.*
 # assignment pdf file
 *.pdf
 *.ser
+bptree.4096

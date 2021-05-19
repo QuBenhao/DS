@@ -4,7 +4,7 @@ import javafx.util.Pair;
 
 import java.io.Serializable;
 
-public class ListNode implements Serializable {
+public class ListNode{
     public ListNode prev, next;
     // index key
     public String index;

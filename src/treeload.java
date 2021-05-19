@@ -1,4 +1,7 @@
 import bplustree.BPlusTree;
+import bplustree.LeafNode;
+import bplustree.ListNode;
+import bplustree.TNode;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,12 +22,21 @@ public class treeload {
 
         byte[] page = new byte[pageSize];
         FileInputStream inStream = null;
+        FileOutputStream outputStream = null;
+        ByteArrayOutputStream byteOutputStream = null;
+        DataOutputStream dataOutput = null;
+
         try{
             File file = new File(datafile);
             inStream = new FileInputStream(file);
+            outputStream = new FileOutputStream(String.format("bptree.%d",pageSize), true);
+            byteOutputStream = new ByteArrayOutputStream();
+            dataOutput = new DataOutputStream(byteOutputStream);
+
             // calculate tree degree
             int degree = (int) Math.sqrt((double) file.length()/pageSize);
-            BPlusTree tree = new BPlusTree(degree);
+            degree = 30;
+            BPlusTree tree = new BPlusTree(degree, pageSize);
             startTime = System.nanoTime();
             int numBytesRead = 0;
             int pageIndex = 0;
@@ -51,25 +63,34 @@ public class treeload {
                 pageIndex++;
             }
 
-            FileOutputStream fileOut = new FileOutputStream(String.format("tree%d.ser",pageSize));
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(tree);
-            finishTime = System.nanoTime();
+            TNode node = tree.root;
+            while (node.leftmost_child!=null){
+                node = node.leftmost_child;
+            }
+            while (node !=null){
+                ((LeafNode)node).write_to_file(byteOutputStream, dataOutput, outputStream);
+                node = ((LeafNode) node).right;
+            }
+            tree.bfs_debug();
 
-            out.close();
-            fileOut.close();
             finishTime = System.nanoTime();
-
-//            tree.bfs_debug();
         }catch (FileNotFoundException e) {
             System.err.println("File not found " + e.getMessage());
         } catch (IOException e) {
             System.err.println("IO Exception " + e.getMessage());
         }
         finally {
-
             if (inStream != null) {
                 inStream.close();
+            }
+            if (dataOutput != null) {
+                dataOutput.close();
+            }
+            if (byteOutputStream != null) {
+                byteOutputStream.close();
+            }
+            if (outputStream != null) {
+                outputStream.close();
             }
         }
 
