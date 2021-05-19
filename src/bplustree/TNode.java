@@ -72,6 +72,7 @@ public abstract class TNode {
             for(int i=0;i<this.sep_mid-1;i++){
                 curr = curr.next;
             }
+            // Separate TreeNode from mid
             TreeNode sep_node = new TreeNode(this.max_capacity);
             sep_node.capacity = this.capacity - this.sep_mid;
             sep_node.root = curr.next;
@@ -93,6 +94,10 @@ public abstract class TNode {
             }else {
                 this.parent.insert(index, this);
             }
+            // TreeNode separate is different, as it needs to move middle index from sep_node.root to parent Node
+            sep_node.leftmost_child = sep_node.root.child;
+            sep_node.root = sep_node.root.next;
+            sep_node.capacity--;
         }
     }
 

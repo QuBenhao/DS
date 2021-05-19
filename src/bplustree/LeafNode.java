@@ -57,9 +57,11 @@ public class LeafNode extends TNode{
         // after the insertion, Node is full
         if(this.capacity > this.max_capacity){
             curr = this.root;
+            // find the middle LeafNode to separate
             for(int i=0;i<this.sep_mid;i++){
                 curr = curr.next;
             }
+            // create separated LeafNode
             LeafNode sep_leaf = new LeafNode(this.max_capacity);
             sep_leaf.capacity = this.capacity - this.sep_mid;
             sep_leaf.root = curr;
@@ -67,6 +69,7 @@ public class LeafNode extends TNode{
             sep_leaf.left = this;
             sep_leaf.parent = this.parent;
 
+            // break the link of ListNode between separate LeafNode and resign capacity
             this.last = curr.prev;
             this.last.next = null;
             curr.prev = null;
