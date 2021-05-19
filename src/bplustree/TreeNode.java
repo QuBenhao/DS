@@ -1,8 +1,8 @@
 package bplustree;
 
 public class TreeNode extends TNode{
-    public TreeNode(int degree){
-        super(degree);
+    public TreeNode(){
+        super();
     }
 
     @Override

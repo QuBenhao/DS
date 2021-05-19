@@ -8,8 +8,8 @@ public class LeafNode extends TNode{
     // Doubly LinkedList
     public LeafNode left, right;
 
-    public LeafNode(int max_capacity){
-        super(max_capacity);
+    public LeafNode(){
+        super();
         this.left = this.right = null;
     }
 
@@ -59,15 +59,15 @@ public class LeafNode extends TNode{
         }
 
         // after the insertion, Node is full
-        if(this.capacity > this.max_capacity){
+        if(this.capacity > BPlusTree.degree-1){
             curr = this.root;
             // find the middle LeafNode to separate
-            for(int i=0;i<this.sep_mid;i++){
+            for(int i=0;i<(BPlusTree.degree-1)/2;i++){
                 curr = curr.next;
             }
             // create separated LeafNode
-            LeafNode sep_leaf = new LeafNode(this.max_capacity);
-            sep_leaf.capacity = this.capacity - this.sep_mid;
+            LeafNode sep_leaf = new LeafNode();
+            sep_leaf.capacity = this.capacity - BPlusTree.degree/2;
             sep_leaf.root = curr;
             sep_leaf.last = this.last;
             sep_leaf.left = this;
@@ -78,12 +78,12 @@ public class LeafNode extends TNode{
             this.last = curr.prev;
             this.last.next = null;
             curr.prev = null;
-            this.capacity = this.sep_mid;
+            this.capacity = BPlusTree.degree/2;
             this.right = sep_leaf;
 
             // insert middle index into parent TreeNode
             if(this.parent == null){
-                this.parent = new TreeNode(this.max_capacity);
+                this.parent = new TreeNode();
                 this.parent.leftmost_child = this;
                 this.parent.root = new ListNode();
                 this.parent.root.index = sep_leaf.root.index;

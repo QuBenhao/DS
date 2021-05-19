@@ -45,7 +45,7 @@ public class treeload {
                         break;
                     }
                     String sdtNameString = new String(sdtnameBytes);
-//                    System.out.printf("Insert %s, %d, %d\n", sdtNameString, pageIndex, slots);
+                    System.out.printf("Insert %s, %d, %d\n", sdtNameString, pageIndex, slots);
                     tree.insert(sdtNameString,pageIndex,slots);
                 }
                 pageIndex++;

@@ -9,19 +9,10 @@ public abstract class TNode implements Serializable {
     // the first and last ListNode
     public ListNode root, last;
     public TNode leftmost_child, parent;
-    // maximum capacity: degree - 1
-    protected final int max_capacity;
-    // how many ListNodes belong to left when full
-    protected final int sep_mid;
     protected int capacity;
-    public TNode(int max_capacity){
+    public TNode(){
         this.root = this.last = null;
         this.leftmost_child = this.parent = null;
-        this.max_capacity = max_capacity;
-        if(this.max_capacity % 2 == 0)
-            this.sep_mid = this.max_capacity / 2;
-        else
-            this.sep_mid = (this.max_capacity - 1) / 2;
         this.capacity = 0;
     }
 
@@ -71,24 +62,24 @@ public abstract class TNode implements Serializable {
         }
 
         // after the insertion, Node is full
-        if(this.capacity > this.max_capacity){
+        if(this.capacity > BPlusTree.degree - 1){
             curr = this.root;
-            for(int i=0;i<this.sep_mid-1;i++){
+            for(int i=0;i<BPlusTree.degree/2-1;i++){
                 curr = curr.next;
             }
             // Separate TreeNode from mid
-            TreeNode sep_node = new TreeNode(this.max_capacity);
-            sep_node.capacity = this.capacity - this.sep_mid;
+            TreeNode sep_node = new TreeNode();
+            sep_node.capacity = this.capacity - BPlusTree.degree/2;
             sep_node.root = curr.next;
             sep_node.last = this.last;
             sep_node.parent = this.parent;
 
             curr.next = null;
-            this.capacity = this.sep_mid;
+            this.capacity = BPlusTree.degree/2;
             this.last = curr;
 
             if(this.parent == null){
-                this.parent = new TreeNode(this.max_capacity);
+                this.parent = new TreeNode();
                 this.parent.leftmost_child = this;
                 this.parent.root = new ListNode();
                 this.parent.root.index = sep_node.root.index;
@@ -162,7 +153,7 @@ public abstract class TNode implements Serializable {
     public abstract void delete(String index);
 
     public void debug_print(){
-        System.out.printf("Capacity: %d, Max: %d\n", this.capacity, this.max_capacity);
+        System.out.printf("Capacity: %d, Max: %d\n", this.capacity, BPlusTree.degree-1);
         ListNode curr = this.root;
         while (curr !=null){
             System.out.println(curr.index);

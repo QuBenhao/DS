@@ -8,17 +8,17 @@ import java.util.ArrayList;
 // currently implement non-clustered index
 public class BPlusTree implements Serializable {
     // the order of the tree
-    public final int degree;
+    public static int degree;
     public TNode root;
 
     public BPlusTree(int degree){
-        this.degree = degree;
+        BPlusTree.degree = degree;
         this.root = null;
     }
 
     public void insert(String index, int pageIndex, int slots){
         if(this.root == null)
-            this.root = new LeafNode(this.degree-1);
+            this.root = new LeafNode();
         this.root.insert(index, pageIndex, slots);
         if(this.root.parent != null)
             this.root = this.root.parent;
