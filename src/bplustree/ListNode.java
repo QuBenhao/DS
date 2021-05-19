@@ -18,11 +18,14 @@ public class ListNode{
         this.index = index;
         this.child = null;
     }
+}
 
-    public ListNode(ListNode last, String index){
-        this.prev = last;
-        this.next = null;
-        this.index = index;
-        this.child = null;
+
+class LeafListNode extends ListNode{
+    public int pageIndex, slots;
+    public LeafListNode(String index, int pageIndex, int slots){
+        super(index);
+        this.pageIndex = pageIndex;
+        this.slots = slots;
     }
 }
