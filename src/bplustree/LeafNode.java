@@ -67,6 +67,7 @@ public class LeafNode extends TNode{
             sep_leaf.root = curr;
             sep_leaf.last = this.last;
             sep_leaf.left = this;
+            sep_leaf.right = this.right;
             sep_leaf.parent = this.parent;
 
             // break the link of ListNode between separate LeafNode and resign capacity
