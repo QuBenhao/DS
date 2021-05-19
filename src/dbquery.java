@@ -16,7 +16,7 @@ public class dbquery {
             return;
         }
 
-        String text = args[0];
+        String text = args[0].replace('_',' ');
         // match text format, as this won't change, create only once
         String sFormat = String.format("(.*)%s(.*)", text);
 

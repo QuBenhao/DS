@@ -22,7 +22,6 @@ public class BPlusTree implements Serializable {
         this.root.insert(index, pageIndex, slots);
         if(this.root.parent != null)
             this.root = this.root.parent;
-        this.root.debug_print();
     }
 
     public Pair<Integer, Integer> query(String index){

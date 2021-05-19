@@ -1,13 +1,9 @@
 public class constants{
     public static final int DBLOAD_ARG_COUNT = 3;
     public static final int DBQUERY_ARG_COUNT = 2;
-    public static final int TREELOAD_ARG_COUNT = 1;
-    public static final int TREEQUERY_ARG_COUNT = 2;
 
     public static final int DBLOAD_PAGE_SIZE_ARG = 1;
-    public static final int TREELOAD_PAGE_SIZE_ARG = 0;
     public static final int DBQUERY_PAGE_SIZE_ARG = 1;
-    public static final int TREEQUERY_PAGE_SIZE_ARG = 1;
     public static final int DATAFILE_ARG = 2;
     public static final int STD_NAME_SIZE = 24;
     public static final int ID_SIZE = 4;
@@ -106,7 +102,13 @@ public class constants{
                                             DAY_SIZE + 
                                             TIME_SIZE + 
                                             SENSORID_SIZE + 
-                                            SENSORNAME_SIZE;    
+                                            SENSORNAME_SIZE;
 
-
+    public static final int TREELOAD_ARG_COUNT = 1;
+    public static final int TREEQUERY_MIN_ARG_COUNT = 2;
+    public static final int TREEQUERY_MIN_PAGE_SIZE_ARG = 1;
+    public static final int TREEQUERY_MAX_ARG_COUNT = 3;
+    public static final int TREEQUERY_MAX_PAGE_SIZE_ARG = 2;
+    public static final int TREELOAD_PAGE_SIZE_ARG = 0;
+    public static final int POINTER_SIZE = 10;
 }

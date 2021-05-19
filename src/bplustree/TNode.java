@@ -65,8 +65,7 @@ public abstract class TNode implements Serializable {
                 System.err.println("Insert in TreeNode as root should never occur!");
                 this.root = this.last = curr;
             }else {
-                prev.next = curr;
-                this.last = curr;
+                prev.next = this.last = curr;
             }
             this.capacity++;
         }
@@ -94,6 +93,7 @@ public abstract class TNode implements Serializable {
                 this.parent.root = new ListNode();
                 this.parent.root.index = sep_node.root.index;
                 this.parent.root.child = sep_node;
+                this.parent.last = this.parent.root;
                 sep_node.parent = this.parent;
                 this.parent.capacity++;
             }else {
@@ -133,12 +133,11 @@ public abstract class TNode implements Serializable {
             return this.last.child.query(index);
         }else{
             ListNode curr = this.root;
-            while (curr !=null){
-                if(index.compareTo(curr.index) >= 0)
+            while (curr.next !=null){
+                if(index.compareTo(curr.index) >= 0 && index.compareTo(curr.next.index) < 0)
                     return curr.child.query(index);
                 curr = curr.next;
             }
-
         }
         return null;
     }
@@ -151,12 +150,11 @@ public abstract class TNode implements Serializable {
             return this.last.child.query(start_index, end_index);
         }else{
             ListNode curr = this.root;
-            while (curr !=null){
-                if(start_index.compareTo(curr.index) >= 0)
+            while(curr.next !=null){
+                if(start_index.compareTo(curr.index) >= 0 && start_index.compareTo(curr.next.index) < 0)
                     return curr.child.query(start_index, end_index);
                 curr = curr.next;
             }
-
         }
         return null;
     }

@@ -88,6 +88,7 @@ public class LeafNode extends TNode{
                 this.parent.root = new ListNode();
                 this.parent.root.index = sep_leaf.root.index;
                 this.parent.root.child = sep_leaf;
+                this.parent.last = this.parent.root;
                 this.parent.capacity++;
                 sep_leaf.parent = this.parent;
             }else {
