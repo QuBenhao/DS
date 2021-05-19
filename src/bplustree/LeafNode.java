@@ -4,8 +4,8 @@ public class LeafNode extends TNode{
     // Doubly LinkedList
     public LeafNode left, right;
 
-    public LeafNode(int degree){
-        super(degree);
+    public LeafNode(int max_capacity){
+        super(max_capacity);
         this.left = this.right = null;
     }
 
@@ -22,6 +22,7 @@ public class LeafNode extends TNode{
         // insert index into the LinkedList
         while (curr!=null){
             int cmp = curr.index.compareTo(index);
+            // insert index with ordering
             if(cmp > 0){
                 if(prev == null){
                     this.root = new LeafListNode(index, pageIndex, slots);
@@ -54,16 +55,17 @@ public class LeafNode extends TNode{
         }
 
         // after the insertion, Node is full
-        if(this.capacity > this.degree){
+        if(this.capacity > this.max_capacity){
             curr = this.root;
             for(int i=0;i<this.sep_mid;i++){
                 curr = curr.next;
             }
-            LeafNode sep_leaf = new LeafNode(this.degree);
+            LeafNode sep_leaf = new LeafNode(this.max_capacity);
             sep_leaf.capacity = this.capacity - this.sep_mid;
             sep_leaf.root = curr;
             sep_leaf.last = this.last;
             sep_leaf.left = this;
+            sep_leaf.parent = this.parent;
 
             this.last = curr.prev;
             this.last.next = null;
@@ -73,11 +75,13 @@ public class LeafNode extends TNode{
 
             // insert middle index into parent TreeNode
             if(this.parent == null){
-                this.parent = new TreeNode(this.degree);
+                this.parent = new TreeNode(this.max_capacity);
                 this.parent.leftmost_child = this;
                 this.parent.root = new ListNode();
                 this.parent.root.index = sep_leaf.root.index;
                 this.parent.root.child = sep_leaf;
+                this.parent.capacity++;
+                sep_leaf.parent = this.parent;
             }else {
                 this.parent.insert(sep_leaf.root.index, sep_leaf);
             }
