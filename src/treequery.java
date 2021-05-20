@@ -49,11 +49,12 @@ public class treequery {
 
             // calculate tree degree
             int degree = (int) Math.sqrt((double) file.length()/pageSize);
-            degree = 30;
+            startTime = System.nanoTime();
+
             BPlusTree tree = new BPlusTree(degree,pageSize,inStream_tree);
+
             tree.bfs_debug();
 
-            startTime = System.nanoTime();
             byte[] sdtnameBytes = new byte[constants.STD_NAME_SIZE];
             byte[] idBytes = new byte[constants.ID_SIZE];
             byte[] dateBytes = new byte[constants.DATE_SIZE];

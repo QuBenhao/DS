@@ -30,10 +30,10 @@ public abstract class TNode{
             if(cmp > 0){
                 // this should never happen (as previous root is smaller than insert index)
                 if(prev == null){
-                    System.err.println("Insert in TreeNode as root should never occur!");
-                    this.root = new ListNode(index);
-                    this.root.child = child;
-                    this.root.next = curr;
+                    prev = new ListNode(index);
+                    prev.next = this.root;
+                    prev.child = child;
+                    this.root = prev;
                 }else {
                     prev.next = new ListNode(index);
                     prev.next.child = child;
@@ -101,12 +101,12 @@ public abstract class TNode{
         // insert into last if index > last.index
         if(leftmost_child != null && index.compareTo(this.root.index) < 0){
             leftmost_child.insert(index, pageIndex, slots);
-        }else if(this.last != null && index.compareTo(this.last.index) > 0){
+        }else if(this.last != null && index.compareTo(this.last.index) >= 0){
             this.last.child.insert(index, pageIndex, slots);
         }else{
             ListNode curr = this.root;
             while (curr !=null){
-                if(index.compareTo(curr.index) > 0) {
+                if(index.compareTo(curr.index) >= 0) {
                     curr.child.insert(index, pageIndex, slots);
                     break;
                 }
