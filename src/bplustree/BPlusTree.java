@@ -2,6 +2,8 @@ package bplustree;
 
 import constant.constants;
 import javafx.util.Pair;
+import utils.LinkedList;
+import utils.Node;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,35 +64,35 @@ public class BPlusTree {
     public void insert(String index, int pageIndex, int slots){
         if(this.root == null)
             this.root = new LeafNode();
-        this.root.insert(index, pageIndex, slots);
+        this.root.insert(index,new Pair<Integer,Integer>(pageIndex, slots));
         if(this.root.parent != null)
             this.root = this.root.parent;
     }
 
-    public Pair<Integer, Integer> query(String index){
-        Pair<Integer,Integer> result = this.root.query(index);
-        if(result == null)
-            System.out.printf("Index: %s does not exists!\n", index);
-        return result;
-    }
-
-    public ArrayList<Pair<Integer, Integer>> query(String start_index, String end_index){
-        // in case end_index is smaller than start index
-        if (start_index.compareTo(end_index) > 0){
-            String temp = end_index;
-            end_index = start_index;
-            start_index = temp;
-        }
-        ArrayList<Pair<Integer, Integer>> result = this.root.query(start_index, end_index);
-        if(result.isEmpty())
-            System.out.printf("Index: between %s and %s does not exists!\n", start_index, end_index);
-        return result;
-    }
+//    public Pair<Integer, Integer> query(String index){
+//        Pair<Integer,Integer> result = this.root.query(index);
+//        if(result == null)
+//            System.out.printf("Index: %s does not exists!\n", index);
+//        return result;
+//    }
+//
+//    public ArrayList<Pair<Integer, Integer>> query(String start_index, String end_index){
+//        // in case end_index is smaller than start index
+//        if (start_index.compareTo(end_index) > 0){
+//            String temp = end_index;
+//            end_index = start_index;
+//            start_index = temp;
+//        }
+//        ArrayList<Pair<Integer, Integer>> result = this.root.query(start_index, end_index);
+//        if(result.isEmpty())
+//            System.out.printf("Index: between %s and %s does not exists!\n", start_index, end_index);
+//        return result;
+//    }
 
     public void bfs_debug(){
         ArrayList<TNode> nodes = new ArrayList<>();
         System.out.println("root:");
-        System.out.println(this.root.root.index);
+        System.out.println(this.root.lists.root.index);
         nodes.add(this.root);
         int level = 0;
         while (!nodes.isEmpty()){
@@ -99,10 +101,11 @@ public class BPlusTree {
             nodes.forEach(node->{
                 if(node!=null) {
                     next.add(node.leftmost_child);
-                    ListNode start = node.root;
-                    node.debug_print();
+                    Node start = node.lists.root;
+                    node.print();
                     while (start!=null){
-                        next.add(start.child);
+                        if(start.child!=null && !(start.child instanceof LeafNode))
+                            next.add(start.child);
                         start = start.next;
                     }
                 }
@@ -111,5 +114,18 @@ public class BPlusTree {
             System.out.println();
             level++;
         }
+
+        TNode node = this.root;
+        while (node.leftmost_child!=null)
+            node = node.leftmost_child;
+        int data = 0;
+        while (node!=null) {
+            node.print();
+            data += node.lists.capacity;
+            node = ((LeafNode)node).right;
+
+        }
+        System.out.printf("LeafNode data: %d\n", data);
+
     }
 }

@@ -21,18 +21,18 @@ public class test {
             myTree.bfs_debug();
         }
 
-        System.out.println("Query:");
-        while (true){
-            System.out.println("Input index, index");
-            line = stdin.readLine();
-            if (line.compareTo("\n\n")==0 || line.compareTo("\n")==0 || line.compareTo(" ")==0)
-                break;
-            String[] arr = line.split("\n")[0].split(" ");
-            ArrayList<Pair<Integer,Integer>> result = myTree.query(arr[0],arr[1]);
-            result.forEach(p->{
-                System.out.println(p.toString());
-            });
-        }
+//        System.out.println("Query:");
+//        while (true){
+//            System.out.println("Input index, index");
+//            line = stdin.readLine();
+//            if (line.compareTo("\n\n")==0 || line.compareTo("\n")==0 || line.compareTo(" ")==0)
+//                break;
+//            String[] arr = line.split("\n")[0].split(" ");
+//            ArrayList<Pair<Integer,Integer>> result = myTree.query(arr[0],arr[1]);
+//            result.forEach(p->{
+//                System.out.println(p.toString());
+//            });
+//        }
 
 //        FileOutputStream fileOut = new FileOutputStream("tree.ser");
 //        ObjectOutputStream out = new ObjectOutputStream(fileOut);

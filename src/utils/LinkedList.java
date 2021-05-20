@@ -73,6 +73,7 @@ public class LinkedList {
             curr = curr.next;
         }
         sep_list.root = curr.next;
+        curr.next = null;
         sep_list.last = this.last;
         sep_list.capacity = (this.capacity+1)/2;
         this.last = curr;
@@ -95,5 +96,24 @@ public class LinkedList {
         }
         // return null means the leftmost_child
         return res;
+    }
+
+    public Node pop_first(){
+        Node temp = this.root;
+        if(this.last == this.root)
+            this.last = temp.next;
+        this.root = temp.next;
+        temp.next = null;
+        this.capacity--;
+        return temp;
+    }
+
+    public void print(){
+        Node node = root;
+        while (node!=null){
+            System.out.printf("%s ", node.index);
+            node = node.next;
+        }
+        System.out.println();
     }
 }
