@@ -30,9 +30,9 @@ public class LeafNode extends TNode{
         ListNode curr = this.root, prev = null;
         // insert index into the LinkedList
         while (curr!=null){
-            int cmp = curr.index.compareTo(index);
+            int cmp = index.compareTo(curr.index);
             // insert index with ordering
-            if(cmp > 0){
+            if(cmp < 0){
                 if(prev == null){
                     this.root = new LeafListNode(index, pageIndex, slots);
                     this.root.next = curr;
@@ -72,7 +72,7 @@ public class LeafNode extends TNode{
             }
             // create separated LeafNode
             LeafNode sep_leaf = new LeafNode();
-            sep_leaf.capacity = this.capacity - BPlusTree.degree/2;
+            sep_leaf.capacity = (this.capacity+1)/2;
             sep_leaf.root = curr;
             sep_leaf.last = this.last;
             sep_leaf.left = this;
@@ -83,7 +83,7 @@ public class LeafNode extends TNode{
             this.last = curr.prev;
             this.last.next = null;
             curr.prev = null;
-            this.capacity = BPlusTree.degree/2;
+            this.capacity -= sep_leaf.capacity;
             this.right = sep_leaf;
 
             // insert middle index into parent TreeNode

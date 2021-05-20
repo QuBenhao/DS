@@ -36,6 +36,7 @@ public class treequery {
         String treefile = String.format("bptree.%d", pageSize);
         long startTime = 0;
         long finishTime = 0;
+        long tree_start = 0, tree_end = 0;
 
         int numBytesIntField = Integer.BYTES;
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
@@ -49,11 +50,12 @@ public class treequery {
 
             // calculate tree degree
             int degree = (int) Math.sqrt((double) file.length()/pageSize);
-            startTime = System.nanoTime();
-
+            tree_start = System.nanoTime();
             BPlusTree tree = new BPlusTree(degree,pageSize,inStream_tree);
-
+            tree_end = System.nanoTime();
             tree.bfs_debug();
+
+            startTime = System.nanoTime();
 
             byte[] sdtnameBytes = new byte[constants.STD_NAME_SIZE];
             byte[] idBytes = new byte[constants.ID_SIZE];
@@ -69,7 +71,7 @@ public class treequery {
             RandomAccessFile raf = new RandomAccessFile(datafile, "r");
             // range query
             if(end_index!=null) {
-                ArrayList<Pair<Integer, Integer>> result = tree.query(start_index, end_index.toString());
+                ArrayList<Pair<Integer, Integer>> result = tree.query(start_index, end_index);
                 if (!result.isEmpty()){
                     result.forEach(p -> {
                         int pageIndex = p.getKey();
@@ -122,6 +124,7 @@ public class treequery {
                             e.printStackTrace();
                         }
                     });
+                    System.out.printf("\nRange query result: %d records found.\n", result.size());
                 }
             }else {
                 Pair<Integer, Integer> result = tree.query(start_index);
@@ -191,8 +194,10 @@ public class treequery {
                 inStream_tree.close();
             }
         }
-
+        long treeInMilliseconds = (tree_end - tree_start)/constants.MILLISECONDS_PER_SECOND;
+        System.out.println("Time taken for constructing B+Tree: " + treeInMilliseconds + " ms");
         long timeInMilliseconds = (finishTime - startTime)/constants.MILLISECONDS_PER_SECOND;
-        System.out.println("Time taken: " + timeInMilliseconds + " ms");
+        System.out.println("Time taken for query: " + timeInMilliseconds + " ms");
+        System.out.println("Total Time taken: " + (treeInMilliseconds + timeInMilliseconds) + " ms");
     }
 }

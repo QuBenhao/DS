@@ -60,7 +60,6 @@ public class treeload {
                 }
                 pageIndex++;
             }
-            tree.bfs_debug();
 
             TNode node = tree.root;
             while (node.leftmost_child!=null){
@@ -73,9 +72,8 @@ public class treeload {
                     if(curr == null)
                         curr = node.root;
                     dataOutput.writeBytes(dbload.getStringOfLength(curr.index, constants.STD_NAME_SIZE));
-                    dataOutput.writeInt(((bplustree.LeafListNode)curr).value.getKey());
+                    dataOutput.writeInt(((LeafListNode)curr).value.getKey());
                     dataOutput.writeInt(((LeafListNode)curr).value.getValue());
-                    System.out.println(curr.index);
                     curr = curr.next;
                     if(curr == null)
                         node = ((LeafNode)node).right;
@@ -83,6 +81,7 @@ public class treeload {
                     num_records++;
                 }
                 if(num_records % BPlusTree.num_record_per_page == 0) {
+                    dataOutput.flush();
                     byte[] paget = new byte[BPlusTree.pageSize];
                     byte[] records = byteOutputStream.toByteArray();
                     int numberBytesToCopy = byteOutputStream.size();
@@ -95,6 +94,7 @@ public class treeload {
 
             // At end of csv, check if there are records in the current page to be written out
             if (num_records % BPlusTree.num_record_per_page != 0) {
+                dataOutput.flush();
                 byte[] paget = new byte[BPlusTree.pageSize];
                 byte[] records = byteOutputStream.toByteArray();
                 int numberBytesToCopy = byteOutputStream.size();
@@ -103,9 +103,9 @@ public class treeload {
                 byteOutputStream.reset();
                 num_of_page_used++;
             }
-//            tree.bfs_debug();
 
             finishTime = System.nanoTime();
+//            tree.bfs_debug();
         }catch (FileNotFoundException e) {
             System.err.println("File not found " + e.getMessage());
         } catch (IOException e) {

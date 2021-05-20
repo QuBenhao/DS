@@ -3,7 +3,6 @@ package bplustree;
 import constant.constants;
 import javafx.util.Pair;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -54,6 +53,7 @@ public class BPlusTree {
             }
             node_page_count ++;
         }
+        System.out.printf("Total page loaded: %d\n",node_page_count);
     }
 
 
@@ -89,25 +89,37 @@ public class BPlusTree {
         ArrayList<TNode> nodes = new ArrayList<>();
         System.out.println("root:");
         System.out.println(this.root.root.index);
-        nodes.add(this.root);
-        int level = 0;
-        while (!nodes.isEmpty()){
-            System.out.printf("Current level at: %d%n",level);
-            ArrayList<TNode> next = new ArrayList<>();
-            nodes.forEach(node->{
-                if(node!=null) {
-                    next.add(node.leftmost_child);
-                    ListNode start = node.root;
-                    node.debug_print();
-                    while (start!=null){
-                        next.add(start.child);
-                        start = start.next;
-                    }
-                }
-            });
-            nodes = next;
-            System.out.println();
-            level++;
+//        nodes.add(this.root);
+//        int level = 0;
+//        while (!nodes.isEmpty()){
+//            System.out.printf("Current level at: %d%n",level);
+//            ArrayList<TNode> next = new ArrayList<>();
+//            nodes.forEach(node->{
+//                if(node!=null) {
+//                    next.add(node.leftmost_child);
+//                    ListNode start = node.root;
+//                    node.debug_print();
+//                    while (start!=null){
+//                        if(start.child!=null && !(start.child instanceof LeafNode))
+//                            next.add(start.child);
+//                        start = start.next;
+//                    }
+//                }
+//            });
+//            nodes = next;
+//            System.out.println();
+//            level++;
+//        }
+        TNode node = this.root;
+        while (node.leftmost_child!=null)
+            node = node.leftmost_child;
+        int data = 0;
+        while (node!=null) {
+            node.debug_print();
+            data += node.capacity;
+            node = ((LeafNode)node).right;
+
         }
+        System.out.printf("LeafNode data: %d\n", data);
     }
 }

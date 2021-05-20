@@ -59,22 +59,28 @@ public abstract class TNode{
             }
             this.capacity++;
         }
+        child.parent = this;
 
         // after the insertion, Node is full
         if(this.capacity > BPlusTree.degree - 1){
+            boolean child_at_left = false;
             curr = this.root;
+            if(curr.child == child)
+                child_at_left = true;
             for(int i=0;i<BPlusTree.degree/2-1;i++){
                 curr = curr.next;
+                if(curr.child == child)
+                    child_at_left = true;
             }
             // Separate TreeNode from mid
             TreeNode sep_node = new TreeNode();
-            sep_node.capacity = this.capacity - BPlusTree.degree/2;
+            sep_node.capacity = (this.capacity+1)/2;
             sep_node.root = curr.next;
             sep_node.last = this.last;
             sep_node.parent = this.parent;
 
             curr.next = null;
-            this.capacity = BPlusTree.degree/2;
+            this.capacity -= sep_node.capacity;
             this.last = curr;
 
             if(this.parent == null){
@@ -91,8 +97,11 @@ public abstract class TNode{
             }
             // TreeNode separate is different, as it needs to move middle index from sep_node.root to parent Node
             sep_node.leftmost_child = sep_node.root.child;
+            sep_node.leftmost_child.parent = sep_node;
             sep_node.root = sep_node.root.next;
             sep_node.capacity--;
+            if(!child_at_left)
+                child.parent = sep_node;
         }
     }
 
@@ -104,12 +113,13 @@ public abstract class TNode{
         }else if(this.last != null && index.compareTo(this.last.index) >= 0){
             this.last.child.insert(index, pageIndex, slots);
         }else{
-            ListNode curr = this.root;
+            ListNode curr = this.root, prev = null;
             while (curr !=null){
-                if(index.compareTo(curr.index) >= 0) {
-                    curr.child.insert(index, pageIndex, slots);
+                if(index.compareTo(curr.index) < 0) {
+                    prev.child.insert(index, pageIndex, slots);
                     break;
                 }
+                prev = curr;
                 curr = curr.next;
             }
 
@@ -122,10 +132,11 @@ public abstract class TNode{
         }else if(this.last != null && index.compareTo(this.last.index) >= 0){
             return this.last.child.query(index);
         }else{
-            ListNode curr = this.root;
+            ListNode curr = this.root, prev = null;
             while (curr.next !=null){
-                if(index.compareTo(curr.index) >= 0 && index.compareTo(curr.next.index) < 0)
-                    return curr.child.query(index);
+                if(index.compareTo(curr.index) < 0)
+                    return prev.child.query(index);
+                prev = curr;
                 curr = curr.next;
             }
         }
@@ -139,10 +150,11 @@ public abstract class TNode{
         }else if(this.last != null && start_index.compareTo(this.last.index) >= 0){
             return this.last.child.query(start_index, end_index);
         }else{
-            ListNode curr = this.root;
-            while(curr.next !=null){
-                if(start_index.compareTo(curr.index) >= 0 && start_index.compareTo(curr.next.index) < 0)
-                    return curr.child.query(start_index, end_index);
+            ListNode curr = this.root, prev = null;
+            while (curr.next !=null){
+                if(start_index.compareTo(curr.index) < 0)
+                    return prev.child.query(start_index, end_index);
+                prev = curr;
                 curr = curr.next;
             }
         }
