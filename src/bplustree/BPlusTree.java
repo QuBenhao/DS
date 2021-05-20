@@ -50,6 +50,8 @@ public class BPlusTree {
                 System.arraycopy(page, ((i*numBytesInOneRecord) + constants.SLOTS_OFFSET), slotsBytes, 0, Integer.BYTES);
                 int pageIndex = ByteBuffer.wrap(pageIndexBytes).getInt();
                 int slots = ByteBuffer.wrap(slotsBytes).getInt();
+
+                // TODO: load tree
                 this.insert(sdtNameString, pageIndex, slots);
             }
             node_page_count ++;
