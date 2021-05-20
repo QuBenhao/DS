@@ -1,4 +1,5 @@
 import bplustree.BPlusTree;
+import constant.constants;
 import javafx.util.Pair;
 
 import java.io.*;
@@ -32,6 +33,7 @@ public class treequery {
         }else
             pageSize = Integer.parseInt(args[constants.TREEQUERY_MIN_PAGE_SIZE_ARG]);
         String datafile = "heap." + pageSize;
+        String treefile = String.format("bptree.%d", pageSize);
         long startTime = 0;
         long finishTime = 0;
 
@@ -39,12 +41,16 @@ public class treequery {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
 
         FileInputStream inStream = null;
+        FileInputStream inStream_tree = null;
         try{
             File file = new File(datafile);
             inStream = new FileInputStream(file);
+            inStream_tree = new FileInputStream(treefile);
+
             // calculate tree degree
             int degree = (int) Math.sqrt((double) file.length()/pageSize);
-            BPlusTree tree = new BPlusTree(degree,pageSize);
+            degree = 30;
+            BPlusTree tree = new BPlusTree(degree,pageSize,inStream_tree);
             tree.bfs_debug();
 
             startTime = System.nanoTime();
@@ -179,6 +185,9 @@ public class treequery {
 
             if (inStream != null) {
                 inStream.close();
+            }
+            if (inStream_tree != null){
+                inStream_tree.close();
             }
         }
 

@@ -1,5 +1,6 @@
 package bplustree;
 
+import constant.constants;
 import javafx.util.Pair;
 
 import java.io.ByteArrayOutputStream;
@@ -135,23 +136,20 @@ public class LeafNode extends TNode{
 
     public void write_to_file(ByteArrayOutputStream byteOutputStream,DataOutputStream dataOutput, FileOutputStream outputStream) throws IOException {
         /*
-        int capacity 4 bytes
         for each{
             String index 24 bytes
             int pageIndex 4bytes
             int slots 4bytes
         }
-        total: capacity * 32 + 4 bytes
-        page needed = (capacity * 32 + 4) / pageSize
-        maximum = (degree-1) * 32 + 4
+        total: capacity * 32 bytes
+        page needed = capacity * 32/ pageSize
+        maximum = (degree-1) * 32
          */
         int num_records = 0;
         ListNode curr = this.root;
-        System.out.println(BPlusTree.pageNeeded);
-        System.out.println(BPlusTree.num_record_per_page);
         for(int i=0;i<BPlusTree.pageNeeded;i++) {
             while (curr!=null && num_records < BPlusTree.num_record_per_page) {
-                dataOutput.writeBytes(this.getStringOfLength(curr.index, 24));
+                dataOutput.writeBytes(this.getStringOfLength(curr.index, constants.STD_NAME_SIZE));
                 dataOutput.writeInt(((LeafListNode)curr).value.getKey());
                 dataOutput.writeInt(((LeafListNode)curr).value.getValue());
                 curr = curr.next;
@@ -160,7 +158,6 @@ public class LeafNode extends TNode{
 
             byte[] page = new byte[BPlusTree.pageSize];
             byte[] records = byteOutputStream.toByteArray();
-            System.out.println(records);
             int numberBytesToCopy = byteOutputStream.size();
             System.arraycopy(records, 0, page, 0, numberBytesToCopy);
             outputStream.write(page);

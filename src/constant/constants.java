@@ -1,3 +1,5 @@
+package constant;
+
 public class constants{
     public static final int DBLOAD_ARG_COUNT = 3;
     public static final int DBQUERY_ARG_COUNT = 2;
@@ -110,4 +112,9 @@ public class constants{
     public static final int TREEQUERY_MAX_ARG_COUNT = 3;
     public static final int TREEQUERY_MAX_PAGE_SIZE_ARG = 2;
     public static final int TREELOAD_PAGE_SIZE_ARG = 0;
+    public static final int PAGE_INDEX_SIZE = 4;
+    public static final int PAGE_INDEX_OFFSET = STD_NAME_SIZE;
+    public static final int SLOTS_SIZE = 4;
+    public static final int SLOTS_OFFSET = STD_NAME_SIZE + PAGE_INDEX_SIZE;
+    public static final int LEAF_TOTAL_SIZE = STD_NAME_SIZE + PAGE_INDEX_SIZE + SLOTS_SIZE;
 }
