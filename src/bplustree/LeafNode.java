@@ -18,6 +18,7 @@ public class LeafNode extends TreeNode{
 
     @Override
     public int binary_search(Key key){
+        // same as TreeNode, as keys are stored in LeafData, LeafNode no longer needs keys
         if(this.capacity > 0 && this.values.get(0).key.compareTo(key) > 0)
             return -1;
         int l = 0, r = this.capacity - 1;
@@ -37,48 +38,42 @@ public class LeafNode extends TreeNode{
         int pos = binary_search(data.key) + 1;
         this.values.add(pos, data);
         this.capacity++;
-        // Full: has to split
+        // LeafNode is Full: has to split
         if(this.capacity == BPlusTree.degree){
             LeafNode sep = new LeafNode();
             sep.parent = this.parent;
+            // Doubly link LeafNodes
             sep.left = this;
             sep.right = this.right;
             if(this.right != null)
                 this.right.left = sep;
             this.right = sep;
+
             ListIterator<LeafData> listIterator = this.values.listIterator((this.capacity-1)/2);
             while(listIterator.hasNext())
                 sep.values.add(listIterator.next());
             sep.capacity = (this.capacity+1)/2;
 
-            // TODO: remove assert
-            assert sep.capacity == sep.values.size();
-
             this.values.removeAll(sep.values);
             this.capacity -= sep.capacity;
 
-            //TODO
-            assert this.capacity == this.values.size();
-
+            // similar to TreeNode, but should not remove first key in sep node
             // insert sep first Key into TreeNode
             if(this.parent == null){
                 this.parent = new TreeNode();
                 this.parent.leftmost_child = this;
-                // TODO
-                assert sep.values.peekFirst() != null;
-                this.parent.keys.add(sep.values.peekFirst().key);
+                this.parent.keys.add(sep.values.get(0).key);
                 this.parent.children.add(sep);
                 this.parent.capacity++;
                 sep.parent = this.parent;
             }else{
                 // insert new entry into parent node
-                //TODO
-                assert sep.values.peekFirst() != null;
-                this.parent.insert(sep.values.peekFirst().key, sep);
+                this.parent.insert(sep.values.get(0).key, sep);
             }
         }
     }
 
+    // equal query
     @Override
     public Pair<Integer, Integer> query(Key key){
         int pos = this.binary_search(key);
@@ -88,18 +83,26 @@ public class LeafNode extends TreeNode{
         return new Pair<>(res.pageIndex,res.slots);
     }
 
+    // range query
     @Override
     public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
-        boolean stop = false;
         ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
         LeafNode node = this;
+        boolean stop = false;
+
         while (node!=null){
-            int pos = node.binary_search(start_key);
-            if(pos == -1)
-                pos = 0;
-            ListIterator<LeafData> listIterator = node.values.listIterator(pos);
+            // the first node can binary search start key,
+            // the other will always start at the first key (which is greater than start_key)
+            ListIterator<LeafData> listIterator = node.values.listIterator();
+            if(node == this) {
+                int pos = node.binary_search(start_key);
+                if (pos == -1)
+                    pos = 0;
+                listIterator = node.values.listIterator(pos);
+            }
             while (listIterator.hasNext()){
                 LeafData d = listIterator.next();
+                // if reaches end_key, stop
                 if(d.key.compareTo(end_key) > 0) {
                     stop = true;
                     break;
@@ -139,6 +142,7 @@ public class LeafNode extends TreeNode{
     }
 
 
+    // same as TreeNode
     @Override
     public void print(){
         System.out.printf("Node capacity: %d\n", this.capacity);

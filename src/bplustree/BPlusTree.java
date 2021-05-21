@@ -12,59 +12,39 @@ public class BPlusTree {
     public static int degree, pageSize;
     public TreeNode root;
     public BPlusTree(int degree, int pageSize){
+        // maximum child pointer a TreeNode can have (or: max_capacity+1)
         BPlusTree.degree = degree;
+        // pageSize: used for reading tree file to construct tree
         BPlusTree.pageSize = pageSize;
+        // empty root start from a LeafNode
         this.root = new LeafNode();
     }
 
     public void insert(LeafData data){
         this.root.insert(data);
+        // if after the insertion, root has spliced, assign root to new root (root.parent)
         if(this.root.parent!=null)
             this.root = this.root.parent;
     }
 
-    public void print(){
-        ArrayList<TreeNode> nodes = new ArrayList<>();
-        nodes.add(this.root);
-        int level = 0;
-        while(!nodes.isEmpty()){
-            System.out.printf("Current level: %d\n", level);
-            ArrayList<TreeNode> next = new ArrayList<TreeNode>();
-            for(TreeNode node:nodes){
-                if(node == null)
-                    continue;
-                node.print();
-                System.out.println();
-                if(node.leftmost_child instanceof LeafNode)
-                    continue;
-                next.add(node.leftmost_child);
-                next.addAll(node.children);
-            }
-            nodes = next;
-            level++;
-        }
-
-        System.out.println("LeafNodes:");
-        TreeNode node = this.root;
-        while(node.leftmost_child!=null)
-            node = node.leftmost_child;
-        int count = 0;
-        while (node !=null){
-            node.print();
-            count += node.capacity;
-            node = ((LeafNode)node).right;
-        }
-        System.out.printf("LeafNode data: %d\n", count);
-    }
-
+    // range Query
     public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key) {
+        // if end_key happens to be smaller, switch them
+        if(end_key.compareTo(start_key) < 0) {
+            System.err.println("End Index is smaller than start index, switching...");
+            Key temp = start_key;
+            start_key = end_key;
+            end_key = temp;
+        }
         return this.root.query(start_key, end_key);
     }
 
+    // equal Query, could replace this function with range Query input same key
     public Pair<Integer, Integer> query(Key key) {
         return this.root.query(key);
     }
 
+    // build B+Tree from sorted index pointer file
     public void construct(FileInputStream inputStream) throws IOException {
         byte[] page = new byte[pageSize];
         byte[] sdtnameBytes = new byte[constants.STD_NAME_SIZE];
@@ -97,5 +77,40 @@ public class BPlusTree {
             node_page_count ++;
         }
         System.out.printf("Total page loaded: %d\n",node_page_count);
+    }
+
+    // print the tree
+    public void print(){
+        ArrayList<TreeNode> nodes = new ArrayList<>();
+        nodes.add(this.root);
+        int level = 0;
+        while(!nodes.isEmpty()){
+            System.out.printf("Current level: %d\n", level);
+            ArrayList<TreeNode> next = new ArrayList<>();
+            for(TreeNode node:nodes){
+                if(node == null)
+                    continue;
+                node.print();
+                System.out.println();
+                if(node.leftmost_child instanceof LeafNode)
+                    continue;
+                next.add(node.leftmost_child);
+                next.addAll(node.children);
+            }
+            nodes = next;
+            level++;
+        }
+
+        System.out.printf("LeafNodes level: %d\n", level);
+        TreeNode node = this.root;
+        while(node.leftmost_child!=null)
+            node = node.leftmost_child;
+        int count = 0;
+        while (node !=null){
+            node.print();
+            count += node.capacity;
+            node = ((LeafNode)node).right;
+        }
+        System.out.printf("LeafNode total data: %d\n", count);
     }
 }

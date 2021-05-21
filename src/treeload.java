@@ -2,9 +2,8 @@ import bplustree.*;
 import constant.constants;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 
 public class treeload {
     public static void main(String[] args) throws IOException {
@@ -36,17 +35,18 @@ public class treeload {
             outputStream = new FileOutputStream(String.format("bptree.%d",pageSize), true);
             byteOutputStream = new ByteArrayOutputStream();
             dataOutput = new DataOutputStream(byteOutputStream);
-
-            startTime = System.nanoTime();
             int numBytesRead = 0;
             int pageIndex = 0;
             byte[] sdtnameBytes = new byte[constants.STD_NAME_SIZE];
+
+            startTime = System.nanoTime();
 
             // until the end of the binary file is reached
             while ((numBytesRead = inStream.read(page)) != -1) {
                 // Process each record in page
                 for (int i = 0; i < numRecordsPerPage; i++) {
                     records_loaded++;
+                    // which byte the data is located in current page
                     int slots = i * constants.TOTAL_SIZE;
 
                     // Copy record's SdtName (field is located at multiples of the total record byte length)
@@ -64,10 +64,14 @@ public class treeload {
             }
 
             // sort index based on sensorId first, then timestamp
-            data.sort(Comparator.comparing((LeafData d) -> d.key.sensorId).thenComparing((LeafData d) -> d.key.timestamp));
+            Collections.sort(data);
+
+            // bulk loading: save sorted leafNode indexes and pointer to original heap data
             for(LeafData d: data){
                 num_records++;
+                // each data needs 32 bytes
                 d.write(dataOutput);
+                // Write one page
                 if(num_records % numLeafRecordsPerPage == 0) {
                     dataOutput.flush();
                     byte[] paget = new byte[pageSize];
@@ -80,7 +84,7 @@ public class treeload {
                 }
             }
 
-            // At end of csv, check if there are records in the current page to be written out
+            // At end of ArrayList, check if there are LeafData in the current page to be written out
             if (num_records % numLeafRecordsPerPage != 0) {
                 dataOutput.flush();
                 byte[] paget = new byte[pageSize];

@@ -5,7 +5,7 @@ import constant.constants;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class LeafData{
+public class LeafData implements Comparable<LeafData>{
     public Key key;
     public int pageIndex;
     public int slots;
@@ -17,6 +17,12 @@ public class LeafData{
     }
 
     public void write(DataOutputStream dataOutput) throws IOException {
+        /*
+        key: fixed length String 24 bytes
+        pageIndex: int 4 bytes
+        slots: int 4 bytes
+        Total: 32 bytes
+         */
         dataOutput.writeBytes(this.getStringOfLength(this.key.sensorId+this.key.dateTime));
         dataOutput.writeInt(this.pageIndex);
         dataOutput.writeInt(this.slots);
@@ -43,5 +49,10 @@ public class LeafData{
             // if original string is too long, shorten to required length
             return original.substring(0, constants.STD_NAME_SIZE);
         }
+    }
+
+    @Override
+    public int compareTo(LeafData o) {
+        return this.key.compareTo(o.key);
     }
 }

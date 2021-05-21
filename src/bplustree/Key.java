@@ -1,5 +1,7 @@
 package bplustree;
 
+import constant.constants;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -13,27 +15,39 @@ public class Key implements Comparable<Key> {
     public Key(String index){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         Date date;
-        try {
-            sensorId = index.substring(0,1);
-            this.dateTime = index.substring(1);
-            date = dateFormat.parse(index.substring(1));
-        }
-        catch (ParseException e) {
+        // some keys like "501/23/2021 09:00:00 AM " will have a space in the end (dbload, tree output and input)
+        // some keys like "501/23/2021 09:00:00 AM" will be length smaller than STD_NAME_SIZE (query input)
+        if(index.length() < constants.STD_NAME_SIZE || index.charAt(index.length()-1) == ' '){
+            try {
+                sensorId = index.substring(0,1);
+                this.dateTime = index.substring(1);
+                date = dateFormat.parse(index.substring(1));
+            }
+            catch (ParseException e) {
+                e.printStackTrace();
+                date = new Date();
+            }
+        }else {
             try {
                 this.sensorId = index.substring(0,2);
                 this.dateTime = index.substring(2);
                 date = dateFormat.parse(index.substring(2));
-            }catch (ParseException ex){
-                // should not happen
-                ex.printStackTrace();
+            }catch (ParseException e){
+                e.printStackTrace();
                 date = new Date();
             }
         }
         this.timestamp = date.getTime();
     }
 
+    // compare key based on sensorId, then timestamp
+    // Note: if we want to
+    // 1. compare sensorId based on converting to int, or
+    // 2. compare key based on timestamp first,
+    // simply modify the method here and rerun treeload and treequery
     @Override
     public int compareTo(Key o) {
-        return Comparator.comparing((Key k) -> k.sensorId).thenComparing((Key k) -> k.timestamp,Comparator.nullsLast(Comparator.naturalOrder())).compare(this,o);
+        return Comparator.comparing((Key k) -> k.sensorId).thenComparing((Key k) -> k.timestamp,
+                Comparator.nullsLast(Comparator.naturalOrder())).compare(this,o);
     }
 }

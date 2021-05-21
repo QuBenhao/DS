@@ -12,29 +12,28 @@ import java.util.Date;
 public class treequery {
 
     // Reads in a binary file of the argument-specified pagesize, prints out matching records
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         // check for correct number of arguments
         if (args.length > constants.TREEQUERY_MAX_ARG_COUNT || args.length < constants.TREEQUERY_MIN_ARG_COUNT) {
             System.out.println("Error: Incorrect number of arguments were input");
             return;
         }
+
         int pageSize;
-        StringBuilder start_index_builder = new StringBuilder(args[0].replace('_',' '));
-        while (start_index_builder.length() < constants.STD_NAME_SIZE)
-            start_index_builder.append(' ');
-        Key start_key = new Key(start_index_builder.toString()), end_key = null;
-        StringBuilder end_index_builder = null;
+        String start_index = args[0].replace('_',' ');
+        // allowing range query with arguments length
+        Key start_key = new Key(start_index), end_key = null;
         if(args.length == constants.TREEQUERY_MAX_ARG_COUNT) {
-            end_index_builder = new StringBuilder(args[1].replace('_', ' '));
-            while (end_index_builder.length() < constants.STD_NAME_SIZE)
-                end_index_builder.append(' ');
-            end_key = new Key(end_index_builder.toString());
+            String end_index = args[1].replace('_', ' ');
+            end_key = new Key(end_index);
             pageSize = Integer.parseInt(args[constants.TREEQUERY_MAX_PAGE_SIZE_ARG]);
         }else
             pageSize = Integer.parseInt(args[constants.TREEQUERY_MIN_PAGE_SIZE_ARG]);
+
         String datafile = "heap." + pageSize;
         String treefile = String.format("bptree.%d", pageSize);
+
         long startTime = 0;
         long finishTime = 0;
         long tree_start = 0, tree_end = 0;
@@ -53,9 +52,11 @@ public class treequery {
             int degree = (int) Math.sqrt((double) file.length()/pageSize);
             tree_start = System.nanoTime();
             BPlusTree tree = new BPlusTree(degree, pageSize);
+            // construct tree from tree file
             tree.construct(inStream_tree);
             tree_end = System.nanoTime();
 
+            // start query
             startTime = System.nanoTime();
 
             byte[] sdtnameBytes = new byte[constants.STD_NAME_SIZE];
@@ -72,13 +73,16 @@ public class treequery {
             RandomAccessFile raf = new RandomAccessFile(datafile, "r");
             // range query
             if(end_key!=null) {
+                // Range query can have more than one results, using ArrayList to save
                 ArrayList<Pair<Integer, Integer>> result = tree.query(start_key, end_key);
                 if (!result.isEmpty()){
                     result.forEach(p -> {
                         int pageIndex = p.getKey();
                         int slots = p.getValue();
                         try {
+                            // random access file seek to the point we want
                             raf.seek((long) pageIndex * pageSize + slots);
+                            // retrieve the whole data from this point
                             byte[] data = new byte[constants.TOTAL_SIZE];
                             raf.read(data);
                             /*
@@ -128,11 +132,13 @@ public class treequery {
                     System.out.printf("\nRange query result: %d records found.\n", result.size());
                 }
             }else {
+                // equal query
                 Pair<Integer, Integer> result = tree.query(start_key);
                 if (result!=null) {
                     int pageIndex = result.getKey();
                     int slots = result.getValue();
                     try {
+                        // same as Range query
                         raf.seek((long) pageIndex * pageSize + slots);
                         byte[] data = new byte[constants.TOTAL_SIZE];
                         raf.read(data);
@@ -183,8 +189,6 @@ public class treequery {
             }
 
             finishTime = System.nanoTime();
-
-//            tree.print();
         }catch (FileNotFoundException e) {
             System.err.println("File not found " + e.getMessage());
         }
@@ -197,6 +201,8 @@ public class treequery {
                 inStream_tree.close();
             }
         }
+
+        System.out.println();
         long treeInMilliseconds = (tree_end - tree_start)/constants.MILLISECONDS_PER_SECOND;
         System.out.println("Time taken for constructing B+Tree: " + treeInMilliseconds + " ms");
         long timeInMilliseconds = (finishTime - startTime)/constants.MILLISECONDS_PER_SECOND;
