@@ -64,7 +64,7 @@ public class treeload {
             }
 
             // sort index based on sensorId first, then timestamp
-            data.sort(Comparator.comparing((LeafData d) -> d.sensorId).thenComparing((LeafData d) -> d.timestamp));
+            data.sort(Comparator.comparing((LeafData d) -> d.key.sensorId).thenComparing((LeafData d) -> d.key.timestamp));
             for(LeafData d: data){
                 num_records++;
                 d.write(dataOutput);

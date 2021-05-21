@@ -1,12 +1,5 @@
 package bplustree;
 
-public class TreeNode extends TNode{
-    public TreeNode(){
-        super();
-    }
+public class TreeNode {
 
-    @Override
-    public void delete(String index) {
-
-    }
 }
