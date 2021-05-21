@@ -1,7 +1,9 @@
 package bplustree;
 
 import constant.constants;
+import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -19,6 +21,8 @@ public class TreeNode {
     }
 
     public int binary_search(Key key){
+        if(this.capacity > 0 && this.keys.get(0).compareTo(key) > 0)
+            return -1;
         int l = 0, r = this.capacity - 1;
         while(l<r){
             int mid = (l+r+1)/2;
@@ -84,6 +88,20 @@ public class TreeNode {
             this.leftmost_child.insert(data);
         else
             this.children.get(pos).insert(data);
+    }
+
+    public Pair<Integer, Integer> query(Key key){
+        int pos = this.binary_search(key);
+        if(pos == -1)
+            return this.leftmost_child.query(key);
+        return this.children.get(pos).query(key);
+    }
+
+    public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
+        int pos = this.binary_search(start_key);
+        if(pos == -1)
+            return this.leftmost_child.query(start_key, end_key);
+        return this.children.get(pos).query(start_key, end_key);
     }
 
     public void print(){

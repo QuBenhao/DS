@@ -1,5 +1,8 @@
 package bplustree;
 
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -15,6 +18,8 @@ public class LeafNode extends TreeNode{
 
     @Override
     public int binary_search(Key key){
+        if(this.capacity > 0 && this.values.get(0).key.compareTo(key) > 0)
+            return -1;
         int l = 0, r = this.capacity - 1;
         while(l<r){
             int mid = (l+r+1)/2;
@@ -37,6 +42,9 @@ public class LeafNode extends TreeNode{
             LeafNode sep = new LeafNode();
             sep.parent = this.parent;
             sep.left = this;
+            sep.right = this.right;
+            if(this.right != null)
+                this.right.left = sep;
             this.right = sep;
             ListIterator<LeafData> listIterator = this.values.listIterator((this.capacity-1)/2);
             while(listIterator.hasNext())
@@ -70,6 +78,66 @@ public class LeafNode extends TreeNode{
             }
         }
     }
+
+    @Override
+    public Pair<Integer, Integer> query(Key key){
+        int pos = this.binary_search(key);
+        if(pos == -1)
+            return null;
+        LeafData res = this.values.get(pos);
+        return new Pair<>(res.pageIndex,res.slots);
+    }
+
+    @Override
+    public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
+        boolean stop = false;
+        ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
+        LeafNode node = this;
+        while (node!=null){
+            int pos = node.binary_search(start_key);
+            if(pos == -1)
+                pos = 0;
+            ListIterator<LeafData> listIterator = node.values.listIterator(pos);
+            while (listIterator.hasNext()){
+                LeafData d = listIterator.next();
+                if(d.key.compareTo(end_key) > 0) {
+                    stop = true;
+                    break;
+                }
+                result.add(new Pair<>(d.pageIndex, d.slots));
+            }
+            if (stop)
+                break;
+            node = node.right;
+        }
+        return result;
+    }
+
+    public LeafNode construct(LeafData data){
+        // construct from file, leave 20% space for later insertion
+        if(this.capacity == ((BPlusTree.degree-1)*4)/5){
+            this.right = new LeafNode();
+            this.right.parent = this.parent;
+            if(this.parent == null){
+                this.parent = new TreeNode();
+                this.parent.leftmost_child = this;
+                this.parent.keys.add(data.key);
+                this.parent.children.add(this.right);
+                this.parent.capacity++;
+                this.right.parent = this.parent;
+            }else {
+                this.parent.insert(data.key, this.right);
+            }
+            this.right.left = this;
+            this.right.values.add(data);
+            this.right.capacity++;
+            return this.right;
+        }
+        this.values.add(data);
+        this.capacity++;
+        return this;
+    }
+
 
     @Override
     public void print(){
