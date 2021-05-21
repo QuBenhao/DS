@@ -12,19 +12,19 @@ public class LeafNode extends TreeNode{
 
     public LeafNode(){
         super();
-        this.values = new LinkedList<>();
-        this.left = this.right = null;
+        values = new LinkedList<>();
+        left = right = null;
     }
 
     @Override
     public int binary_search(Key key){
         // same as TreeNode, as keys are stored in LeafData, LeafNode no longer needs keys
-        if(this.capacity > 0 && this.values.get(0).key.compareTo(key) > 0)
+        if(capacity > 0 && values.get(0).key.compareTo(key) > 0)
             return -1;
-        int l = 0, r = this.capacity - 1;
+        int l = 0, r = capacity - 1;
         while(l<r){
             int mid = (l+r+1)/2;
-            int cmp = this.values.get(mid).key.compareTo(key);
+            int cmp = values.get(mid).key.compareTo(key);
             if(cmp <= 0)
                 l = mid;
             else
@@ -36,39 +36,39 @@ public class LeafNode extends TreeNode{
     @Override
     public void insert(LeafData data){
         int pos = binary_search(data.key) + 1;
-        this.values.add(pos, data);
-        this.capacity++;
+        values.add(pos, data);
+        capacity++;
         // LeafNode is Full: has to split
-        if(this.capacity == BPlusTree.degree){
+        if(capacity == BPlusTree.degree){
             LeafNode sep = new LeafNode();
-            sep.parent = this.parent;
+            sep.parent = parent;
             // Doubly link LeafNodes
             sep.left = this;
-            sep.right = this.right;
-            if(this.right != null)
-                this.right.left = sep;
-            this.right = sep;
+            sep.right = right;
+            if(right != null)
+                right.left = sep;
+            right = sep;
 
-            ListIterator<LeafData> listIterator = this.values.listIterator((this.capacity-1)/2);
+            ListIterator<LeafData> listIterator = values.listIterator((capacity-1)/2);
             while(listIterator.hasNext())
                 sep.values.add(listIterator.next());
-            sep.capacity = (this.capacity+1)/2;
+            sep.capacity = (capacity+1)/2;
 
-            this.values.removeAll(sep.values);
-            this.capacity -= sep.capacity;
+            values.removeAll(sep.values);
+            capacity -= sep.capacity;
 
             // similar to TreeNode, but should not remove first key in sep node
             // insert sep first Key into TreeNode
-            if(this.parent == null){
-                this.parent = new TreeNode();
-                this.parent.leftmost_child = this;
-                this.parent.keys.add(sep.values.get(0).key);
-                this.parent.children.add(sep);
-                this.parent.capacity++;
-                sep.parent = this.parent;
+            if(parent == null){
+                parent = new TreeNode();
+                parent.leftmost_child = this;
+                parent.keys.add(sep.values.get(0).key);
+                parent.children.add(sep);
+                parent.capacity++;
+                sep.parent = parent;
             }else{
                 // insert new entry into parent node
-                this.parent.insert(sep.values.get(0).key, sep);
+                parent.insert(sep.values.get(0).key, sep);
             }
         }
     }
@@ -76,10 +76,10 @@ public class LeafNode extends TreeNode{
     // equal query
     @Override
     public Pair<Integer, Integer> query(Key key){
-        int pos = this.binary_search(key);
+        int pos = binary_search(key);
         if(pos == -1)
             return null;
-        LeafData res = this.values.get(pos);
+        LeafData res = values.get(pos);
         return new Pair<>(res.pageIndex,res.slots);
     }
 
@@ -118,26 +118,26 @@ public class LeafNode extends TreeNode{
 
     public LeafNode construct(LeafData data){
         // construct from file, leave 20% space for later insertion
-        if(this.capacity == ((BPlusTree.degree-1)*4)/5){
-            this.right = new LeafNode();
-            this.right.parent = this.parent;
-            if(this.parent == null){
-                this.parent = new TreeNode();
-                this.parent.leftmost_child = this;
-                this.parent.keys.add(data.key);
-                this.parent.children.add(this.right);
-                this.parent.capacity++;
-                this.right.parent = this.parent;
+        if(capacity == ((BPlusTree.degree-1)*4)/5){
+            right = new LeafNode();
+            right.parent = parent;
+            if(parent == null){
+                parent = new TreeNode();
+                parent.leftmost_child = this;
+                parent.keys.add(data.key);
+                parent.children.add(right);
+                parent.capacity++;
+                right.parent = parent;
             }else {
-                this.parent.insert(data.key, this.right);
+                parent.insert(data.key, right);
             }
-            this.right.left = this;
-            this.right.values.add(data);
-            this.right.capacity++;
-            return this.right;
+            right.left = this;
+            right.values.add(data);
+            right.capacity++;
+            return right;
         }
-        this.values.add(data);
-        this.capacity++;
+        values.add(data);
+        capacity++;
         return this;
     }
 
@@ -145,8 +145,8 @@ public class LeafNode extends TreeNode{
     // same as TreeNode
     @Override
     public void print(){
-        System.out.printf("Node capacity: %d\n", this.capacity);
-        for(LeafData d:this.values)
+        System.out.printf("Node capacity: %d\n", capacity);
+        for(LeafData d:values)
             System.out.printf("%s%s\n", d.key.sensorId, d.key.dateTime);
         System.out.println();
     }

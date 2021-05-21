@@ -11,7 +11,7 @@ public class LeafData implements Comparable<LeafData>{
     public int slots;
 
     public LeafData(String index, int pageIndex, int slots){
-        this.key = new Key(index);
+        key = new Key(index);
         this.pageIndex = pageIndex;
         this.slots = slots;
     }
@@ -23,9 +23,9 @@ public class LeafData implements Comparable<LeafData>{
         slots: int 4 bytes
         Total: 32 bytes
          */
-        dataOutput.writeBytes(this.getStringOfLength(this.key.sensorId+this.key.dateTime));
-        dataOutput.writeInt(this.pageIndex);
-        dataOutput.writeInt(this.slots);
+        dataOutput.writeBytes(getStringOfLength(key.sensorId+key.dateTime));
+        dataOutput.writeInt(pageIndex);
+        dataOutput.writeInt(slots);
     }
 
     // Returns a whitespace padded string of the same length as parameter int length
@@ -53,6 +53,6 @@ public class LeafData implements Comparable<LeafData>{
 
     @Override
     public int compareTo(LeafData o) {
-        return this.key.compareTo(o.key);
+        return key.compareTo(o.key);
     }
 }

@@ -20,7 +20,7 @@ public class Key implements Comparable<Key> {
         if(index.length() < constants.STD_NAME_SIZE || index.charAt(index.length()-1) == ' '){
             try {
                 sensorId = index.substring(0,1);
-                this.dateTime = index.substring(1);
+                dateTime = index.substring(1);
                 date = dateFormat.parse(index.substring(1));
             }
             catch (ParseException e) {
@@ -29,15 +29,15 @@ public class Key implements Comparable<Key> {
             }
         }else {
             try {
-                this.sensorId = index.substring(0,2);
-                this.dateTime = index.substring(2);
+                sensorId = index.substring(0,2);
+                dateTime = index.substring(2);
                 date = dateFormat.parse(index.substring(2));
             }catch (ParseException e){
                 e.printStackTrace();
                 date = new Date();
             }
         }
-        this.timestamp = date.getTime();
+        timestamp = date.getTime();
     }
 
     // compare key based on sensorId, then timestamp

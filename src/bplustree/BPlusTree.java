@@ -17,14 +17,14 @@ public class BPlusTree {
         // pageSize: used for reading tree file to construct tree
         BPlusTree.pageSize = pageSize;
         // empty root start from a LeafNode
-        this.root = new LeafNode();
+        root = new LeafNode();
     }
 
     public void insert(LeafData data){
-        this.root.insert(data);
+        root.insert(data);
         // if after the insertion, root has spliced, assign root to new root (root.parent)
-        if(this.root.parent!=null)
-            this.root = this.root.parent;
+        if(root.parent!=null)
+            root = root.parent;
     }
 
     // range Query
@@ -36,12 +36,12 @@ public class BPlusTree {
             start_key = end_key;
             end_key = temp;
         }
-        return this.root.query(start_key, end_key);
+        return root.query(start_key, end_key);
     }
 
     // equal Query, could replace this function with range Query input same key
     public Pair<Integer, Integer> query(Key key) {
-        return this.root.query(key);
+        return root.query(key);
     }
 
     // build B+Tree from sorted index pointer file
@@ -55,7 +55,7 @@ public class BPlusTree {
         int numBytesInOneRecord = constants.LEAF_TOTAL_SIZE;
         int numRecordsPerPage = pageSize/numBytesInOneRecord;
 
-        LeafNode node = (LeafNode) this.root;
+        LeafNode node = (LeafNode) root;
         while ((numBytesRead = inputStream.read(page)) != -1) {
             for (int i = 0; i < numRecordsPerPage; i++) {
                 // Copy record's SdtName (field is located at multiples of the total record byte length)
@@ -71,8 +71,8 @@ public class BPlusTree {
                 int pageIndex = ByteBuffer.wrap(pageIndexBytes).getInt();
                 int slots = ByteBuffer.wrap(slotsBytes).getInt();
                 node = node.construct(new LeafData(sdtNameString, pageIndex, slots));
-                if(this.root.parent !=null)
-                    this.root = this.root.parent;
+                if(root.parent !=null)
+                    root = root.parent;
             }
             node_page_count ++;
         }
@@ -82,7 +82,7 @@ public class BPlusTree {
     // print the tree
     public void print(){
         ArrayList<TreeNode> nodes = new ArrayList<>();
-        nodes.add(this.root);
+        nodes.add(root);
         int level = 0;
         while(!nodes.isEmpty()){
             System.out.printf("Current level: %d\n", level);
@@ -102,7 +102,7 @@ public class BPlusTree {
         }
 
         System.out.printf("LeafNodes level: %d\n", level);
-        TreeNode node = this.root;
+        TreeNode node = root;
         while(node.leftmost_child!=null)
             node = node.leftmost_child;
         int count = 0;

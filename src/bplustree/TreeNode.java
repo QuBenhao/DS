@@ -13,23 +13,23 @@ public class TreeNode {
     public int capacity;
 
     public TreeNode(){
-        this.keys = new LinkedList<>();
-        this.children = new LinkedList<>();
+        keys = new LinkedList<>();
+        children = new LinkedList<>();
         // one more pointer to save keys that are smaller than the first key,
         // other keys will made by their first key in child nodes
-        this.leftmost_child = this.parent = null;
-        this.capacity = 0;
+        leftmost_child = parent = null;
+        capacity = 0;
     }
 
     // binary search to find the position of key belongs to in current keys list
     // return -1 if it's smaller than the minimum key in keys
     public int binary_search(Key key){
-        if(this.capacity > 0 && this.keys.get(0).compareTo(key) > 0)
+        if(capacity > 0 && keys.get(0).compareTo(key) > 0)
             return -1;
-        int l = 0, r = this.capacity - 1;
+        int l = 0, r = capacity - 1;
         while(l<r){
             int mid = (l+r+1)/2;
-            int cmp = this.keys.get(mid).compareTo(key);
+            int cmp = keys.get(mid).compareTo(key);
             if(cmp <= 0)
                 l = mid;
             else
@@ -42,43 +42,43 @@ public class TreeNode {
     public void insert(Key key, TreeNode child){
         // pos: the first position of key that are greater than insert key
         int pos = binary_search(key)+1;
-        this.keys.add(pos, key);
-        this.children.add(pos, child);
-        this.capacity++;
+        keys.add(pos, key);
+        children.add(pos, child);
+        capacity++;
 
         child.parent = this;
         // split current Node if it's full
-        if(this.capacity == BPlusTree.degree){
+        if(capacity == BPlusTree.degree){
             TreeNode sep = new TreeNode();
-            sep.parent = this.parent;
+            sep.parent = parent;
             // child parent is the sep Node if it's inserted in right half
-            if(pos >= (this.capacity-1)/2)
+            if(pos >= (capacity-1)/2)
                 child.parent = sep;
             // split lists into two
-            ListIterator<Key> listIterator1 = this.keys.listIterator((this.capacity-1)/2);
-            ListIterator<TreeNode> listIterator2 = this.children.listIterator((this.capacity-1)/2);
+            ListIterator<Key> listIterator1 = keys.listIterator((capacity-1)/2);
+            ListIterator<TreeNode> listIterator2 = children.listIterator((capacity-1)/2);
             while(listIterator1.hasNext()) {
                 sep.keys.add(listIterator1.next());
                 sep.children.add(listIterator2.next());
             }
-            sep.capacity = (this.capacity+1)/2;
+            sep.capacity = (capacity+1)/2;
             // break the chain of left and right part of lists
-            this.keys.removeAll(sep.keys);
-            this.children.removeAll(sep.children);
-            this.capacity -= sep.capacity;
+            keys.removeAll(sep.keys);
+            children.removeAll(sep.children);
+            capacity -= sep.capacity;
 
             // insert sep first Key into TreeNode
-            if(this.parent == null){
-                this.parent = new TreeNode();
-                this.parent.leftmost_child = this;
+            if(parent == null){
+                parent = new TreeNode();
+                parent.leftmost_child = this;
                 // move mid key to parent
-                this.parent.keys.add(sep.keys.removeFirst());
-                this.parent.children.add(sep);
-                this.parent.capacity++;
-                sep.parent = this.parent;
+                parent.keys.add(sep.keys.removeFirst());
+                parent.children.add(sep);
+                parent.capacity++;
+                sep.parent = parent;
             }else{
                 // insert new sep Node in parent if parent already exists
-                this.parent.insert(sep.keys.removeFirst(), sep);
+                parent.insert(sep.keys.removeFirst(), sep);
             }
             // As this is TreeNode: sep node no longer has the first key, assign its child to leftmost_child
             sep.leftmost_child = sep.children.removeFirst();
@@ -88,36 +88,36 @@ public class TreeNode {
     }
 
     public void insert(LeafData data){
-        int pos = this.binary_search(data.key);
+        int pos = binary_search(data.key);
         // insert key is smaller than minimum key in keys, insert into leftmost_child
         if(pos == -1)
-            this.leftmost_child.insert(data);
+            leftmost_child.insert(data);
         else
-            this.children.get(pos).insert(data);
+            children.get(pos).insert(data);
     }
 
     // equal query
     public Pair<Integer, Integer> query(Key key){
-        int pos = this.binary_search(key);
+        int pos = binary_search(key);
         // query key is smaller than minimum key in keys, query leftmost_child
         if(pos == -1)
-            return this.leftmost_child.query(key);
-        return this.children.get(pos).query(key);
+            return leftmost_child.query(key);
+        return children.get(pos).query(key);
     }
 
     // range query
     public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
-        int pos = this.binary_search(start_key);
+        int pos = binary_search(start_key);
         // same as equal query
         if(pos == -1)
-            return this.leftmost_child.query(start_key, end_key);
-        return this.children.get(pos).query(start_key, end_key);
+            return leftmost_child.query(start_key, end_key);
+        return children.get(pos).query(start_key, end_key);
     }
 
     // for debug purpose, print out node capacity and keys
     public void print(){
-        System.out.printf("Node capacity: %d\n", this.capacity);
-        for(Key key:this.keys)
+        System.out.printf("Node capacity: %d\n", capacity);
+        for(Key key:keys)
             System.out.printf("%s%s; ", key.sensorId, key.dateTime);
         System.out.println();
     }
