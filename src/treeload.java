@@ -97,9 +97,8 @@ public class treeload {
             System.err.println("File not found " + e.getMessage());
         } catch (IOException e) {
             System.err.println("IO Exception " + e.getMessage());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } finally {
+        }
+        finally {
             if (inStream != null) {
                 inStream.close();
             }

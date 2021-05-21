@@ -4,14 +4,13 @@ import constant.constants;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
 
 public class LeafData{
     public Key key;
     public int pageIndex;
     public int slots;
 
-    public LeafData(String index, int pageIndex, int slots) throws ParseException {
+    public LeafData(String index, int pageIndex, int slots){
         this.key = new Key(index);
         this.pageIndex = pageIndex;
         this.slots = slots;
