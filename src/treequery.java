@@ -183,6 +183,8 @@ public class treequery {
             }
 
             finishTime = System.nanoTime();
+
+//            tree.print();
         }catch (FileNotFoundException e) {
             System.err.println("File not found " + e.getMessage());
         }

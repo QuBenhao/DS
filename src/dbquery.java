@@ -1,3 +1,4 @@
+import bplustree.Key;
 import constant.constants;
 
 import java.io.FileInputStream;
@@ -13,16 +14,26 @@ public class dbquery {
     public static void main(String[] args) throws IOException {
 
         // check for correct number of arguments
-        if (args.length != constants.DBQUERY_ARG_COUNT) {
+        if (args.length > constants.TREEQUERY_MAX_ARG_COUNT || args.length < constants.TREEQUERY_MIN_ARG_COUNT) {
             System.out.println("Error: Incorrect number of arguments were input");
             return;
         }
-
-        String text = args[0].replace('_',' ');
-        // match text format, as this won't change, create only once
-        String sFormat = String.format("(.*)%s(.*)", text);
-
-        int pageSize = Integer.parseInt(args[constants.DBQUERY_PAGE_SIZE_ARG]);
+        int pageSize;
+        StringBuilder start_index_builder = new StringBuilder(args[0].replace('_',' '));
+        while (start_index_builder.length() < constants.STD_NAME_SIZE)
+            start_index_builder.append(' ');
+        Key start_key = new Key(start_index_builder.toString()), end_key = null;
+        StringBuilder end_index_builder = null;
+        if(args.length == constants.TREEQUERY_MAX_ARG_COUNT) {
+            end_index_builder = new StringBuilder(args[1].replace('_', ' '));
+            while (end_index_builder.length() < constants.STD_NAME_SIZE)
+                end_index_builder.append(' ');
+            end_key = new Key(end_index_builder.toString());
+            pageSize = Integer.parseInt(args[constants.TREEQUERY_MAX_PAGE_SIZE_ARG]);
+        }else {
+            pageSize = Integer.parseInt(args[constants.TREEQUERY_MIN_PAGE_SIZE_ARG]);
+            end_key = start_key;
+        }
 
         String datafile = "heap." + pageSize;
         long startTime = 0;
@@ -34,6 +45,7 @@ public class dbquery {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         byte[] page = new byte[pageSize];
         FileInputStream inStream = null;
+        int result = 0;
 
         try {
             inStream = new FileInputStream(datafile);
@@ -68,8 +80,9 @@ public class dbquery {
 
                     // Check for match to "text"
                     String sdtNameString = new String(sdtnameBytes);
+                    Key key = new Key(sdtNameString);
                     // if match is found, copy bytes of other fields and print out the record
-                    if (sdtNameString.matches(sFormat)) {
+                    if (key.compareTo(start_key) >=0 && key.compareTo(end_key) <=0) {
                         /*
                          * Fixed Length Records (total size = 112 bytes):
                          * SDT_NAME field = 24 bytes, offset = 0
@@ -86,6 +99,7 @@ public class dbquery {
                          *
                          * Copy the corresponding sections of "page" to the individual field byte arrays
                          */
+                        result++;
                         System.arraycopy(page, ((i*numBytesInOneRecord) + constants.ID_OFFSET), idBytes, 0, numBytesIntField);
                         System.arraycopy(page, ((i*numBytesInOneRecord) + constants.DATE_OFFSET), dateBytes, 0, constants.DATE_SIZE);
                         System.arraycopy(page, ((i*numBytesInOneRecord) + constants.YEAR_OFFSET), yearBytes, 0, numBytesIntField);
@@ -127,6 +141,9 @@ public class dbquery {
             }
         }
 
+        System.out.println();
+        if(result > 1)
+            System.out.printf("Range query result: %d records found.\n", result);
         long timeInMilliseconds = (finishTime - startTime)/constants.MILLISECONDS_PER_SECOND;
         System.out.println("Time taken: " + timeInMilliseconds + " ms");
     }

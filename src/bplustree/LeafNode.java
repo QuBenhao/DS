@@ -143,7 +143,7 @@ public class LeafNode extends TreeNode{
     public void print(){
         System.out.printf("Node capacity: %d\n", this.capacity);
         for(LeafData d:this.values)
-            System.out.printf("%s%s; ", d.key.sensorId, d.key.dateTime);
+            System.out.printf("%s%s\n", d.key.sensorId, d.key.dateTime);
         System.out.println();
     }
 }
