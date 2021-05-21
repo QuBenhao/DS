@@ -67,22 +67,21 @@ public class LeafNode extends TNode{
         if(this.capacity > BPlusTree.degree-1){
             curr = this.root;
             // find the middle LeafNode to separate
-            for(int i=0;i<(BPlusTree.degree-1)/2;i++){
+            for(int i=0;i<BPlusTree.degree/2-1;i++){
                 curr = curr.next;
             }
             // create separated LeafNode
             LeafNode sep_leaf = new LeafNode();
             sep_leaf.capacity = (this.capacity+1)/2;
-            sep_leaf.root = curr;
+            sep_leaf.root = curr.next;
+            curr.next.prev = null;
             sep_leaf.last = this.last;
             sep_leaf.left = this;
             sep_leaf.right = this.right;
             sep_leaf.parent = this.parent;
-
             // break the link of ListNode between separate LeafNode and resign capacity
-            this.last = curr.prev;
+            this.last = curr;
             this.last.next = null;
-            curr.prev = null;
             this.capacity -= sep_leaf.capacity;
             this.right = sep_leaf;
 

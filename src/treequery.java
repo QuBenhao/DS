@@ -53,7 +53,7 @@ public class treequery {
             tree_start = System.nanoTime();
             BPlusTree tree = new BPlusTree(degree,pageSize,inStream_tree);
             tree_end = System.nanoTime();
-            tree.bfs_debug();
+//            tree.bfs_debug();
 
             startTime = System.nanoTime();
 

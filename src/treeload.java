@@ -74,6 +74,7 @@ public class treeload {
                     dataOutput.writeBytes(dbload.getStringOfLength(curr.index, constants.STD_NAME_SIZE));
                     dataOutput.writeInt(((LeafListNode)curr).value.getKey());
                     dataOutput.writeInt(((LeafListNode)curr).value.getValue());
+                    System.out.println(curr.index);
                     curr = curr.next;
                     if(curr == null)
                         node = ((LeafNode)node).right;
@@ -105,7 +106,6 @@ public class treeload {
             }
 
             finishTime = System.nanoTime();
-//            tree.bfs_debug();
         }catch (FileNotFoundException e) {
             System.err.println("File not found " + e.getMessage());
         } catch (IOException e) {

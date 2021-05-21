@@ -26,8 +26,8 @@ public abstract class TNode{
         ListNode curr = this.root, prev = null;
         // insert index into the LinkedList
         while (curr!=null){
-            int cmp = curr.index.compareTo(index);
-            if(cmp > 0){
+            int cmp = index.compareTo(curr.index);
+            if(cmp < 0){
                 // this should never happen (as previous root is smaller than insert index)
                 if(prev == null){
                     prev = new ListNode(index);
@@ -78,7 +78,6 @@ public abstract class TNode{
             sep_node.root = curr.next;
             sep_node.last = this.last;
             sep_node.parent = this.parent;
-
             curr.next = null;
             this.capacity -= sep_node.capacity;
             this.last = curr;
@@ -93,7 +92,7 @@ public abstract class TNode{
                 sep_node.parent = this.parent;
                 this.parent.capacity++;
             }else {
-                this.parent.insert(sep_node.root.index, this);
+                this.parent.insert(sep_node.root.index, sep_node);
             }
             // TreeNode separate is different, as it needs to move middle index from sep_node.root to parent Node
             sep_node.leftmost_child = sep_node.root.child;
