@@ -202,7 +202,6 @@ public class treequery {
             }
         }
 
-        System.out.println();
         long treeInMilliseconds = (tree_end - tree_start)/constants.MILLISECONDS_PER_SECOND;
         System.out.println("Time taken for constructing B+Tree: " + treeInMilliseconds + " ms");
         long timeInMilliseconds = (finishTime - startTime)/constants.MILLISECONDS_PER_SECOND;
