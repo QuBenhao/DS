@@ -1,3 +1,5 @@
+import constant.constants;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -158,7 +160,7 @@ public class dbload {
         }
 
         // print out stats if all operations succeeded
-        if (exceptionOccurred == false) {
+        if (!exceptionOccurred) {
 
             System.out.println("The number of records loaded: " + numRecordsLoaded);
             System.out.println("The number of pages used: " + numberOfPagesUsed);

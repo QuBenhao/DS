@@ -1,100 +1,149 @@
 package bplustree;
 
-public class LeafNode extends TNode{
-    // Doubly LinkedList
+import javafx.util.Pair;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+public class LeafNode extends TreeNode{
+    public LinkedList<LeafData> values;
     public LeafNode left, right;
 
-    public LeafNode(int max_capacity){
-        super(max_capacity);
+    public LeafNode(){
+        super();
+        this.values = new LinkedList<>();
         this.left = this.right = null;
     }
 
-    /*
-     * Insert has three situation:
-     * 1. Both LeafNode and TreeNode are not full, insert into LeafNode directly
-     * 2. Only LeafNode is full, separate LeafNode into two, insert the middle index into TreeNode
-     * 3. Both LeafNode and TreeNode are full: separate LeafNode into two, separate TreeNode into Two,
-     *  insert the middle index of LeafNode into TreeNode, insert middle index of TreeNode into parent TreeNode
-     */
     @Override
-    public void insert(String index, int pageIndex, int slots) {
-        ListNode curr = this.root, prev = null;
-        // insert index into the LinkedList
-        while (curr!=null){
-            int cmp = curr.index.compareTo(index);
-            // insert index with ordering
-            if(cmp > 0){
-                if(prev == null){
-                    this.root = new LeafListNode(index, pageIndex, slots);
-                    this.root.next = curr;
-                    curr.prev = this.root;
-                }else {
-                    prev.next = new LeafListNode(index, pageIndex, slots);
-                    prev.next.prev = prev;
-                    prev = prev.next;
-                    prev.next = curr;
-                    curr.prev = prev;
-                }
-                this.capacity++;
-                break;
-            }
-            prev = curr;
-            curr = curr.next;
+    public int binary_search(Key key){
+        if(this.capacity > 0 && this.values.get(0).key.compareTo(key) > 0)
+            return -1;
+        int l = 0, r = this.capacity - 1;
+        while(l<r){
+            int mid = (l+r+1)/2;
+            int cmp = this.values.get(mid).key.compareTo(key);
+            if(cmp <= 0)
+                l = mid;
+            else
+                r = mid - 1;
         }
-        // insert at back
-        if(curr == null){
-            curr = new LeafListNode(index, pageIndex, slots);
-            if(prev == null){
-                this.root = this.last = curr;
-            }else {
-                prev.next = curr;
-                curr.prev = prev;
-                this.last = curr;
-            }
-            this.capacity++;
-        }
+        return r;
+    }
 
-        // after the insertion, Node is full
-        if(this.capacity > this.max_capacity){
-            curr = this.root;
-            // find the middle LeafNode to separate
-            for(int i=0;i<this.sep_mid;i++){
-                curr = curr.next;
-            }
-            // create separated LeafNode
-            LeafNode sep_leaf = new LeafNode(this.max_capacity);
-            sep_leaf.capacity = this.capacity - this.sep_mid;
-            sep_leaf.root = curr;
-            sep_leaf.last = this.last;
-            sep_leaf.left = this;
-            sep_leaf.right = this.right;
-            sep_leaf.parent = this.parent;
+    @Override
+    public void insert(LeafData data){
+        int pos = binary_search(data.key) + 1;
+        this.values.add(pos, data);
+        this.capacity++;
+        // Full: has to split
+        if(this.capacity == BPlusTree.degree){
+            LeafNode sep = new LeafNode();
+            sep.parent = this.parent;
+            sep.left = this;
+            sep.right = this.right;
+            if(this.right != null)
+                this.right.left = sep;
+            this.right = sep;
+            ListIterator<LeafData> listIterator = this.values.listIterator((this.capacity-1)/2);
+            while(listIterator.hasNext())
+                sep.values.add(listIterator.next());
+            sep.capacity = (this.capacity+1)/2;
 
-            // break the link of ListNode between separate LeafNode and resign capacity
-            this.last = curr.prev;
-            this.last.next = null;
-            curr.prev = null;
-            this.capacity = this.sep_mid;
-            this.right = sep_leaf;
+            // TODO: remove assert
+            assert sep.capacity == sep.values.size();
 
-            // insert middle index into parent TreeNode
+            this.values.removeAll(sep.values);
+            this.capacity -= sep.capacity;
+
+            //TODO
+            assert this.capacity == this.values.size();
+
+            // insert sep first Key into TreeNode
             if(this.parent == null){
-                this.parent = new TreeNode(this.max_capacity);
+                this.parent = new TreeNode();
                 this.parent.leftmost_child = this;
-                this.parent.root = new ListNode();
-                this.parent.root.index = sep_leaf.root.index;
-                this.parent.root.child = sep_leaf;
+                // TODO
+                assert sep.values.peekFirst() != null;
+                this.parent.keys.add(sep.values.peekFirst().key);
+                this.parent.children.add(sep);
                 this.parent.capacity++;
-                sep_leaf.parent = this.parent;
-            }else {
-                this.parent.insert(sep_leaf.root.index, sep_leaf);
+                sep.parent = this.parent;
+            }else{
+                // insert new entry into parent node
+                //TODO
+                assert sep.values.peekFirst() != null;
+                this.parent.insert(sep.values.peekFirst().key, sep);
             }
         }
     }
 
     @Override
-    public void delete(String index) {
-
+    public Pair<Integer, Integer> query(Key key){
+        int pos = this.binary_search(key);
+        if(pos == -1)
+            return null;
+        LeafData res = this.values.get(pos);
+        return new Pair<>(res.pageIndex,res.slots);
     }
 
+    @Override
+    public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
+        boolean stop = false;
+        ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
+        LeafNode node = this;
+        while (node!=null){
+            int pos = node.binary_search(start_key);
+            if(pos == -1)
+                pos = 0;
+            ListIterator<LeafData> listIterator = node.values.listIterator(pos);
+            while (listIterator.hasNext()){
+                LeafData d = listIterator.next();
+                if(d.key.compareTo(end_key) > 0) {
+                    stop = true;
+                    break;
+                }
+                result.add(new Pair<>(d.pageIndex, d.slots));
+            }
+            if (stop)
+                break;
+            node = node.right;
+        }
+        return result;
+    }
+
+    public LeafNode construct(LeafData data){
+        // construct from file, leave 20% space for later insertion
+        if(this.capacity == ((BPlusTree.degree-1)*4)/5){
+            this.right = new LeafNode();
+            this.right.parent = this.parent;
+            if(this.parent == null){
+                this.parent = new TreeNode();
+                this.parent.leftmost_child = this;
+                this.parent.keys.add(data.key);
+                this.parent.children.add(this.right);
+                this.parent.capacity++;
+                this.right.parent = this.parent;
+            }else {
+                this.parent.insert(data.key, this.right);
+            }
+            this.right.left = this;
+            this.right.values.add(data);
+            this.right.capacity++;
+            return this.right;
+        }
+        this.values.add(data);
+        this.capacity++;
+        return this;
+    }
+
+
+    @Override
+    public void print(){
+        System.out.printf("Node capacity: %d\n", this.capacity);
+        for(LeafData d:this.values)
+            System.out.printf("%s%s\n", d.key.sensorId, d.key.dateTime);
+        System.out.println();
+    }
 }
