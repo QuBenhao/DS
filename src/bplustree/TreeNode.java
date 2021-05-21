@@ -37,15 +37,13 @@ public class TreeNode {
         this.children.add(pos, child);
         this.capacity++;
         child.parent = this;
-
         // split
         if(this.capacity == BPlusTree.degree){
             TreeNode sep = new TreeNode();
-
+            sep.parent = this.parent;
             // child parent is the sep Node if it's inserted in right half
             if(pos >= (this.capacity-1)/2)
                 child.parent = sep;
-
             ListIterator<Key> listIterator1 = this.keys.listIterator((this.capacity-1)/2);
             ListIterator<TreeNode> listIterator2 = this.children.listIterator((this.capacity-1)/2);
             while(listIterator1.hasNext()) {
@@ -53,16 +51,9 @@ public class TreeNode {
                 sep.children.add(listIterator2.next());
             }
             sep.capacity = (this.capacity+1)/2;
-
-            // TODO: remove assert
-            assert sep.capacity == sep.keys.size();
-
             this.keys.removeAll(sep.keys);
             this.children.removeAll(sep.children);
             this.capacity -= sep.capacity;
-
-            //TODO
-            assert this.capacity == this.keys.size();
 
             // insert sep first Key into TreeNode
             if(this.parent == null){
@@ -75,15 +66,14 @@ public class TreeNode {
                 this.parent.keys.add(sep.keys.removeFirst());
                 this.parent.children.add(sep);
                 this.parent.capacity++;
+                sep.parent = this.parent;
             }else{
                 // insert new entry into parent node
-                //TODO
-                assert sep.keys.peekFirst() != null;
-
                 this.parent.insert(sep.keys.removeFirst(), sep);
             }
             // sep node no longer has the first key, assign its child to leftmost_child
             sep.leftmost_child = sep.children.removeFirst();
+            sep.leftmost_child.parent = sep;
             sep.capacity--;
         }
     }
