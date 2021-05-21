@@ -2,6 +2,9 @@ import bplustree.*;
 import constant.constants;
 
 import java.io.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class treeload {
     public static void main(String[] args) throws IOException {
@@ -17,12 +20,15 @@ public class treeload {
         int num_records = 0, num_of_page_used = 0, records_loaded = 0;
 
         int numRecordsPerPage = pageSize/constants.TOTAL_SIZE;
+        int numLeafRecordsPerPage = pageSize/constants.LEAF_TOTAL_SIZE;
 
         byte[] page = new byte[pageSize];
         FileInputStream inStream = null;
         FileOutputStream outputStream = null;
         ByteArrayOutputStream byteOutputStream = null;
         DataOutputStream dataOutput = null;
+
+        ArrayList<LeafData> data = new ArrayList<>();
 
         try{
             File file = new File(datafile);
@@ -31,9 +37,6 @@ public class treeload {
             byteOutputStream = new ByteArrayOutputStream();
             dataOutput = new DataOutputStream(byteOutputStream);
 
-            // calculate tree degree
-            int degree = (int) Math.sqrt((double) file.length()/pageSize);
-            BPlusTree tree = new BPlusTree(degree, pageSize);
             startTime = System.nanoTime();
             int numBytesRead = 0;
             int pageIndex = 0;
@@ -55,35 +58,19 @@ public class treeload {
                         break;
                     }
                     String sdtNameString = new String(sdtnameBytes);
-//                    System.out.printf("Insert %s, %d, %d\n", sdtNameString, pageIndex, slots);
-                    tree.insert(sdtNameString,pageIndex,slots);
+                    data.add(new LeafData(sdtNameString, pageIndex, slots));
                 }
                 pageIndex++;
             }
 
-            TNode node = tree.root;
-            while (node.leftmost_child!=null){
-                node = node.leftmost_child;
-            }
-            ListNode curr = null;
-            while (node!=null){
-                int i = 0;
-                while (node!=null && i < BPlusTree.num_record_per_page) {
-                    if(curr == null)
-                        curr = node.root;
-                    dataOutput.writeBytes(dbload.getStringOfLength(curr.index, constants.STD_NAME_SIZE));
-                    dataOutput.writeInt(((LeafListNode)curr).value.getKey());
-                    dataOutput.writeInt(((LeafListNode)curr).value.getValue());
-                    System.out.println(curr.index);
-                    curr = curr.next;
-                    if(curr == null)
-                        node = ((LeafNode)node).right;
-                    i++;
-                    num_records++;
-                }
-                if(num_records % BPlusTree.num_record_per_page == 0) {
+            // sort index based on sensorId first, then timestamp
+            data.sort(Comparator.comparing((LeafData d) -> d.sensorId).thenComparing((LeafData d) -> d.timestamp));
+            for(LeafData d: data){
+                num_records++;
+                d.write(dataOutput);
+                if(num_records % numLeafRecordsPerPage == 0) {
                     dataOutput.flush();
-                    byte[] paget = new byte[BPlusTree.pageSize];
+                    byte[] paget = new byte[pageSize];
                     byte[] records = byteOutputStream.toByteArray();
                     int numberBytesToCopy = byteOutputStream.size();
                     System.arraycopy(records, 0, paget, 0, numberBytesToCopy);
@@ -94,9 +81,9 @@ public class treeload {
             }
 
             // At end of csv, check if there are records in the current page to be written out
-            if (num_records % BPlusTree.num_record_per_page != 0) {
+            if (num_records % numLeafRecordsPerPage != 0) {
                 dataOutput.flush();
-                byte[] paget = new byte[BPlusTree.pageSize];
+                byte[] paget = new byte[pageSize];
                 byte[] records = byteOutputStream.toByteArray();
                 int numberBytesToCopy = byteOutputStream.size();
                 System.arraycopy(records, 0, paget, 0, numberBytesToCopy);
@@ -110,8 +97,9 @@ public class treeload {
             System.err.println("File not found " + e.getMessage());
         } catch (IOException e) {
             System.err.println("IO Exception " + e.getMessage());
-        }
-        finally {
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
             if (inStream != null) {
                 inStream.close();
             }
