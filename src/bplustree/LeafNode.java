@@ -78,6 +78,8 @@ public class LeafNode extends TreeNode{
         if(pos == -1)
             return -1;
         LeafData res = values.get(pos);
+        if(key.compareTo(res.key) != 0)
+            return -1;
         return res.pageIndex * BPlusTree.pageSize + res.slots;
     }
 
