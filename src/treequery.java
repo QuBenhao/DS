@@ -1,7 +1,6 @@
 import bplustree.BPlusTree;
 import bplustree.Key;
 import constant.constants;
-import javafx.util.Pair;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -74,14 +73,12 @@ public class treequery {
             // range query
             if(end_key!=null) {
                 // Range query can have more than one results, using ArrayList to save
-                ArrayList<Pair<Integer, Integer>> result = tree.query(start_key, end_key);
+                ArrayList<Integer> result = tree.query(start_key, end_key);
                 if (!result.isEmpty()){
                     result.forEach(p -> {
-                        int pageIndex = p.getKey();
-                        int slots = p.getValue();
                         try {
                             // random access file seek to the point we want
-                            raf.seek((long) pageIndex * pageSize + slots);
+                            raf.seek(p);
                             // retrieve the whole data from this point
                             byte[] data = new byte[constants.TOTAL_SIZE];
                             raf.read(data);
@@ -133,13 +130,11 @@ public class treequery {
                 }
             }else {
                 // equal query
-                Pair<Integer, Integer> result = tree.query(start_key);
-                if (result!=null) {
-                    int pageIndex = result.getKey();
-                    int slots = result.getValue();
+                int result = tree.query(start_key);
+                if (result!=-1) {
                     try {
                         // same as Range query
-                        raf.seek((long) pageIndex * pageSize + slots);
+                        raf.seek(result);
                         byte[] data = new byte[constants.TOTAL_SIZE];
                         raf.read(data);
                         /*

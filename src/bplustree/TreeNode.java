@@ -1,7 +1,5 @@
 package bplustree;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -97,7 +95,7 @@ public class TreeNode {
     }
 
     // equal query
-    public Pair<Integer, Integer> query(Key key){
+    public int query(Key key){
         int pos = binary_search(key);
         // query key is smaller than minimum key in keys, query leftmost_child
         if(pos == -1)
@@ -106,7 +104,7 @@ public class TreeNode {
     }
 
     // range query
-    public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
+    public ArrayList<Integer> query(Key start_key, Key end_key){
         int pos = binary_search(start_key);
         // same as equal query
         if(pos == -1)

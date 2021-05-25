@@ -1,7 +1,5 @@
 package bplustree;
 
-import javafx.util.Pair;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -28,7 +26,7 @@ public class BPlusTree {
     }
 
     // range Query
-    public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key) {
+    public ArrayList<Integer> query(Key start_key, Key end_key) {
         // if end_key happens to be smaller, switch them
         if(end_key.compareTo(start_key) < 0) {
             System.err.println("End Index is smaller than start index, switching...");
@@ -40,7 +38,7 @@ public class BPlusTree {
     }
 
     // equal Query, could replace this function with range Query input same key
-    public Pair<Integer, Integer> query(Key key) {
+    public int query(Key key) {
         return root.query(key);
     }
 

@@ -1,7 +1,5 @@
 package bplustree;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -75,18 +73,18 @@ public class LeafNode extends TreeNode{
 
     // equal query
     @Override
-    public Pair<Integer, Integer> query(Key key){
+    public int query(Key key){
         int pos = binary_search(key);
         if(pos == -1)
-            return null;
+            return -1;
         LeafData res = values.get(pos);
-        return new Pair<>(res.pageIndex,res.slots);
+        return res.pageIndex * BPlusTree.pageSize + res.slots;
     }
 
     // range query
     @Override
-    public ArrayList<Pair<Integer, Integer>> query(Key start_key, Key end_key){
-        ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
+    public ArrayList<Integer> query(Key start_key, Key end_key){
+        ArrayList<Integer> result = new ArrayList<>();
         LeafNode node = this;
         boolean stop = false;
 
@@ -107,7 +105,7 @@ public class LeafNode extends TreeNode{
                     stop = true;
                     break;
                 }
-                result.add(new Pair<>(d.pageIndex, d.slots));
+                result.add(d.pageIndex * BPlusTree.pageSize + d.slots);
             }
             if (stop)
                 break;
