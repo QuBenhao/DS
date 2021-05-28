@@ -1,5 +1,7 @@
 package constant;
 
+import java.text.SimpleDateFormat;
+
 public class constants{
     public static final int DBLOAD_ARG_COUNT = 3;
     public static final int DBQUERY_ARG_COUNT = 2;
@@ -117,4 +119,5 @@ public class constants{
     public static final int SLOTS_SIZE = 4;
     public static final int SLOTS_OFFSET = STD_NAME_SIZE + PAGE_INDEX_SIZE;
     public static final int LEAF_TOTAL_SIZE = STD_NAME_SIZE + PAGE_INDEX_SIZE + SLOTS_SIZE;
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
 }

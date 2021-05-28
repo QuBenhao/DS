@@ -3,7 +3,6 @@ package bplustree;
 import constant.constants;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -13,7 +12,6 @@ public class Key implements Comparable<Key> {
     public long timestamp;
 
     public Key(String index){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         Date date;
         // some keys like "501/23/2021 09:00:00 AM " will have a space in the end (dbload, tree output and input)
         // some keys like "501/23/2021 09:00:00 AM" will be length smaller than STD_NAME_SIZE (query input)
@@ -21,7 +19,7 @@ public class Key implements Comparable<Key> {
             try {
                 sensorId = index.substring(0,1);
                 dateTime = index.substring(1);
-                date = dateFormat.parse(index.substring(1));
+                date = constants.dateFormat.parse(index.substring(1));
             }
             catch (ParseException e) {
                 e.printStackTrace();
@@ -31,7 +29,7 @@ public class Key implements Comparable<Key> {
             try {
                 sensorId = index.substring(0,2);
                 dateTime = index.substring(2);
-                date = dateFormat.parse(index.substring(2));
+                date = constants.dateFormat.parse(index.substring(2));
             }catch (ParseException e){
                 e.printStackTrace();
                 date = new Date();
