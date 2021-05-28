@@ -117,10 +117,10 @@ public class treeload {
             }
         }
 
-        System.out.println("The number of records loaded: " + records_loaded);
+        System.out.println("The number of records loaded:   " + records_loaded);
         System.out.println("The number of indexes inserted: " + num_records);
-        System.out.println("The number of pages used: " + num_of_page_used);
+        System.out.println("The number of pages used:       " + num_of_page_used);
         long timeInMilliseconds = (finishTime - startTime)/constants.MILLISECONDS_PER_SECOND;
-        System.out.println("Time taken: " + timeInMilliseconds + " ms");
+        System.out.println("Time taken:                     " + timeInMilliseconds + " ms");
     }
 }

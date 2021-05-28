@@ -162,10 +162,10 @@ public class dbload {
         // print out stats if all operations succeeded
         if (!exceptionOccurred) {
 
-            System.out.println("The number of records loaded: " + numRecordsLoaded);
-            System.out.println("The number of pages used: " + numberOfPagesUsed);
+            System.out.println("The number of records loaded:   " + numRecordsLoaded);
+            System.out.println("The number of pages used:       " + numberOfPagesUsed);
             long timeInMilliseconds = (finishTime - startTime)/constants.MILLISECONDS_PER_SECOND;
-            System.out.println("Time taken: " + timeInMilliseconds + " ms");
+            System.out.println("Time taken:                     " + timeInMilliseconds + " ms");
         }
     }
 
