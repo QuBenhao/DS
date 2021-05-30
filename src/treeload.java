@@ -45,7 +45,6 @@ public class treeload {
             while ((numBytesRead = inStream.read(page)) != -1) {
                 // Process each record in page
                 for (int i = 0; i < numRecordsPerPage; i++) {
-                    records_loaded++;
                     // which byte the data is located in current page
                     int slots = i * constants.TOTAL_SIZE;
 
@@ -57,6 +56,7 @@ public class treeload {
                         // can stop checking records
                         break;
                     }
+                    records_loaded++;
                     String sdtNameString = new String(sdtnameBytes);
                     data.add(new LeafData(sdtNameString, pageIndex, slots));
                 }
